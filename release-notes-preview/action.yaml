@@ -1,0 +1,72 @@
+name: GitHub Action Release Notes Preview
+description: GitHub Action that publishes a new release.
+inputs:
+  github-token:
+    required: true
+    description: GitHub token that can checkout the repository as well as create tags/releases against it. e.g. 'secrets.GITHUB_TOKEN'
+    default: ${{ github.token }}
+  extra-plugins:
+    required: false
+    description: Extra plugins for pre-install. You can also specify specifying version range for the extra plugins if you prefer.
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Setup tools
+      uses: open-turo/action-setup-tools@v1
+      with:
+        node: 18.15.0
+    - uses: jwalton/gh-find-current-pr@v1
+      id: find-pull-request
+      with:
+        state: open
+    - name: Generate release notes
+      id: release-notes-preview
+      uses: cycjimmy/semantic-release-action@v3
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      with:
+        ci: false
+        dry_run: true
+        extra_plugins: ${{ inputs.extra-plugins }}
+    - name: Check for release notes comment
+      uses: peter-evans/find-comment@v2
+      id: fc
+      if: steps.find-pull-request.outputs.number != ''
+      with:
+        issue-number: ${{ steps.find-pull-request.outputs.number }}
+        comment-author: "github-actions[bot]"
+        body-includes: " <!-- release notes preview comment -->"
+    - name: Delete previous release note
+      if: steps.fc.outputs.comment-id != ''
+      uses: jungwinter/comment@v1
+      with:
+        type: delete
+        comment_id: ${{ steps.fc.outputs.comment-id }}
+        token: ${{ inputs.github-token }}
+    - name: Comment release notes preview
+      uses: peter-evans/create-or-update-comment@v1
+      if: steps.release-notes-preview.outputs.new_release_notes != '' && steps.find-pull-request.outputs.number != ''
+      with:
+        issue-number: ${{ steps.find-pull-request.outputs.number }}
+        body: |
+          ## Release notes preview
+          Below is a preview of the release notes if your PR gets merged.
+
+          ---
+          <!-- release notes preview comment -->
+          ${{ steps.release-notes-preview.outputs.new_release_notes }}
+    - name: Create no release created
+      uses: peter-evans/create-or-update-comment@v1
+      if: steps.release-notes-preview.outputs.new_release_notes == '' && steps.find-pull-request.outputs.number != ''
+      with:
+        issue-number: ${{ steps.find-pull-request.outputs.number }}
+        body: |
+          <!-- release notes preview comment -->
+          ## Release notes preview
+          **_No_ new release will be created.**
+
+          If you are expecting a release, you will need to either fix a bug or add a feature.
+          Chores, CI, docs, refactoring, style and other changes will not trigger a release.
