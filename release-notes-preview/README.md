@@ -34,10 +34,11 @@ jobs:
 
 ## Inputs
 
-| parameter     | description                                                                                                           | required | default |
-| ------------- | --------------------------------------------------------------------------------------------------------------------- | -------- | ------- |
-| extra-plugins | Extra plugins for pre-install. You can also specify specifying version range for the extra plugins if you prefer.     | `false`  |         |
-| github-token  | GitHub token that can checkout the repository as well as create tags/releases against it. e.g. 'secrets.GITHUB_TOKEN' | `true`   |         |
+| parameter        | description                                                                                                           | required | default |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------- | -------- | ------- |
+| extra-plugins    | Extra plugins for pre-install. You can also specify specifying version range for the extra plugins if you prefer.     | `false`  |         |
+| github-token     | GitHub token that can checkout the repository as well as create tags/releases against it. e.g. 'secrets.GITHUB_TOKEN' | `true`   |         |
+| semantic-version | Specify what version of semantic release to use                                                                       | `false`  |         |
 
 ## Outputs
 

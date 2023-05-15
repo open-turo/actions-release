@@ -14,6 +14,9 @@ inputs:
   extra-plugins:
     required: false
     description: Extra plugins for pre-install. You can also specify specifying version range for the extra plugins if you prefer.
+  semantic-version:
+    required: false
+    description: Specify what version of semantic release to use
 runs:
   using: composite
   steps:
@@ -38,6 +41,7 @@ runs:
         ci: false
         dry_run: true
         extra_plugins: ${{ inputs.extra-plugins }}
+        semantic_version: ${{ inputs.semantic-version }}
     - name: Check for release notes comment
       uses: peter-evans/find-comment@v2
       id: fc
