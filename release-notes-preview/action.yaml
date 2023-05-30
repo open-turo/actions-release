@@ -1,19 +1,10 @@
 name: GitHub Action Release Notes Preview
 description: GitHub Action that publishes a new release.
 inputs:
-  checkout-ref:
-    required: false
-    description: |
-      The ref to checkout before running semantic-release. When running from a pull_request trigger,
-      this should be 'github.head_ref'.
-    default: ${{ github.ref }}
   github-token:
     required: true
     description: GitHub token that can checkout the repository as well as create tags/releases against it. e.g. 'secrets.GITHUB_TOKEN'
     default: ${{ github.token }}
-  extra-plugins:
-    required: false
-    description: Extra plugins for pre-install. You can also specify specifying version range for the extra plugins if you prefer.
 runs:
   using: composite
   steps:
@@ -31,13 +22,7 @@ runs:
         state: open
     - name: Generate release notes
       id: release-notes-preview
-      uses: cycjimmy/semantic-release-action@v3
-      env:
-        GITHUB_TOKEN: ${{ inputs.github-token }}
-      with:
-        ci: false
-        dry_run: true
-        extra_plugins: ${{ inputs.extra-plugins }}
+      uses: guilhermetod/semantic-release-notes-preview@v1.0.0
     - name: Check for release notes comment
       uses: peter-evans/find-comment@v2
       id: fc
@@ -55,7 +40,7 @@ runs:
         token: ${{ inputs.github-token }}
     - name: Comment release notes preview
       uses: peter-evans/create-or-update-comment@v1
-      if: steps.release-notes-preview.outputs.new_release_notes != '' && steps.find-pull-request.outputs.number != ''
+      if: steps.release-notes-preview.outputs.releaseNotes != '' && steps.find-pull-request.outputs.number != ''
       with:
         issue-number: ${{ steps.find-pull-request.outputs.number }}
         body: |
@@ -64,10 +49,10 @@ runs:
 
           ---
           <!-- release notes preview comment -->
-          ${{ steps.release-notes-preview.outputs.new_release_notes }}
+          ${{ steps.release-notes-preview.outputs.releaseNotes }}
     - name: Create no release created
       uses: peter-evans/create-or-update-comment@v1
-      if: steps.release-notes-preview.outputs.new_release_notes == '' && steps.find-pull-request.outputs.number != ''
+      if: steps.release-notes-preview.outputs.releaseNotes == '' && steps.find-pull-request.outputs.number != ''
       with:
         issue-number: ${{ steps.find-pull-request.outputs.number }}
         body: |
