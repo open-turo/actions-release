@@ -1,6 +1,12 @@
 name: GitHub Action Release Notes Preview
 description: GitHub Action that publishes a new release.
 inputs:
+  checkout-ref:
+    required: false
+    description: |
+      The ref to checkout before running semantic-release. When running from a pull_request trigger,
+      this should be 'github.head_ref'.
+    default: ${{ github.ref }}
   github-token:
     required: true
     description: GitHub token that can checkout the repository as well as create tags/releases against it. e.g. 'secrets.GITHUB_TOKEN'
@@ -13,6 +19,7 @@ runs:
   steps:
     - uses: actions/checkout@v3
       with:
+        ref: ${{ inputs.checkout-ref }}
         fetch-depth: 0
     - name: Setup tools
       uses: open-turo/action-setup-tools@v1
