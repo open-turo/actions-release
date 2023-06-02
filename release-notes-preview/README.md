@@ -28,7 +28,7 @@ jobs:
       - uses: open-turo/actions-release/release-notes-preview@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          extra_plugins: |
+          extra-plugins: |
             @open-turo/semantic-release-config
 ```
 
