@@ -28,17 +28,15 @@ jobs:
       - uses: open-turo/actions-release/release-notes-preview@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          extra-plugins: |
-            @open-turo/semantic-release-config
 ```
 
 ## Inputs
 
-| parameter        | description                                                                                                           | required | default |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------- | -------- | ------- |
-| extra-plugins    | Extra plugins for pre-install. You can also specify specifying version range for the extra plugins if you prefer.     | `false`  |         |
-| github-token     | GitHub token that can checkout the repository as well as create tags/releases against it. e.g. 'secrets.GITHUB_TOKEN' | `true`   |         |
-| semantic-version | Specify what version of semantic release to use                                                                       | `false`  |         |
+| parameter        | description                                                                                                                                                               | required | default                                   |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------- |
+| extra-plugins    | Extra plugins for pre-install. You can also specify specifying version range for the extra plugins if you prefer. Defaults to install @open-turo/semantic-release-config. | `false`  | @open-turo/semantic-release-config@^1.4.0 |
+| github-token     | GitHub token that can checkout the repository as well as create tags/releases against it. e.g. 'secrets.GITHUB_TOKEN'                                                     | `true`   |                                           |
+| semantic-version | Specify what version of semantic release to use                                                                                                                           | `false`  |                                           |
 
 ## Outputs
 
