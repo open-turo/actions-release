@@ -13,6 +13,10 @@ inputs:
   semantic-version:
     required: false
     description: Specify what version of semantic release to use
+  template-url:
+    required: false
+    description: Breaking changes document template URL
+    default: https://raw.githubusercontent.com/open-turo/actions-release/main/templates/breaking-changes.md
 runs:
   using: composite
   steps:
@@ -27,16 +31,119 @@ runs:
       id: find-pull-request
       with:
         state: open
-    - name: Generate release notes
-      id: release-notes-preview
+    - name: Dry-run semantic-release
+      id: semantic
       uses: cycjimmy/semantic-release-action@v3
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       with:
         ci: false
         dry_run: true
+        debug: true
         extra_plugins: ${{ inputs.extra-plugins }}
         semantic_version: ${{ inputs.semantic-version }}
+    - name: Check for breaking changes
+      id: is_breaking
+      shell: bash
+      run: |
+        current=$(echo ${{ steps.semantic.outputs.last_release_version }} |  grep -oE '^([0-9]+)')
+        expected="$((current + 1))"
+        actual=$(echo ${{ steps.semantic.outputs.new_release_version }} |  grep -oE '^([0-9]+)')
+
+        if [[ "$actual" == "$expected" ]]; then
+          echo "next_major=$actual" >> "$GITHUB_OUTPUT"
+          echo "current_major=$current" >> "$GITHUB_OUTPUT"
+          echo "is_breaking=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "is_breaking=false" >> "$GITHUB_OUTPUT"
+        fi
+    - name: Read breaking change template
+      if: steps.is_breaking.outputs.is_breaking == 'true'
+      id: breaking_changes_template
+      shell: bash
+      run: |
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        echo "breaking_changes_template<<$EOF" >> $GITHUB_OUTPUT
+        echo "$(curl -s ${{ inputs.template-url }})" >> $GITHUB_OUTPUT
+        echo "$EOF" >> $GITHUB_OUTPUT
+    - name: Create a comment with breaking changes template
+      id: comment_breaking_changes_template
+      if: steps.is_breaking.outputs.is_breaking == 'true'
+      uses: peter-evans/create-or-update-comment@v1
+      with:
+        issue-number: ${{ steps.find-pull-request.outputs.number }}
+        comment-author: "github-actions[bot]"
+        body: |
+          ${{ steps.breaking_changes_template.outputs.breaking_changes_template }}
+    - name: Check if breaking change document exists
+      id: check_breaking_changes_document
+      if: steps.is_breaking.outputs.is_breaking == 'true'
+      shell: bash
+      run: |
+        if [ -f "./docs/breaking-changes/v${{ steps.is_breaking.outputs.next_major }}.md" ]; then
+          echo "Breaking change doc exists!"
+          echo "breaking_change_doc_exists=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "Breaking change doc doesn't exists! Please create one and commit it to the PR."
+          echo "breaking_change_doc_exists=false" >> "$GITHUB_OUTPUT"
+          exit 1
+        fi
+    - name: Delete breaking change template comment
+      if: steps.check_breaking_changes_document.outputs.breaking_change_doc_exists == 'true'
+      shell: bash
+      run: |
+        search_string=$(curl -s ${{ inputs.template-url }} | head -n 1)
+        pr_number=${{ steps.find-pull-request.outputs.number }}
+
+        # Get comments on the PR
+        comments_json=$(curl -s -H "Authorization: token ${{ inputs.github-token }}" "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$pr_number/comments")
+
+        # Filter comments matching the search string
+        matching_comments=$(echo $comments_json | jq -r --arg search "$search_string" '.[] | select(.body | contains($search)) | .id')
+
+        rm -rf comments.json
+
+        if [ -z "$matching_comments" ]; then
+          echo "No matching comments found."
+        else
+          for comment_id in $matching_comments; do
+            curl -X DELETE -H "Authorization: token ${{ inputs.github-token }}" "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/comments/$comment_id"
+            echo "Deleted comment: $comment_id"
+          done
+        fi
+    - name: Check for breaking change document comment
+      uses: peter-evans/find-comment@v2
+      id: check_breaking_changes_document_comment
+      if: steps.check_breaking_changes_document.outputs.breaking_change_doc_exists == 'true'
+      with:
+        issue-number: ${{ steps.find-pull-request.outputs.number }}
+        comment-author: "github-actions[bot]"
+        body-includes: "Upgrade from v${{ steps.is_breaking.outputs.current_major }}.x to v${{ steps.is_breaking.outputs.next_major }}.x"
+    - name: Delete previous breaking change document comment
+      if: steps.check_breaking_changes_document.outputs.breaking_change_doc_exists == 'true' && steps.check_breaking_changes_document_comment.outputs.comment-id != ''
+      uses: jungwinter/comment@v1
+      with:
+        type: delete
+        comment_id: ${{ steps.check_breaking_changes_document_comment.outputs.comment-id }}
+        token: ${{ inputs.github-token }}
+    - name: Read breaking change document
+      if: steps.check_breaking_changes_document.outputs.breaking_change_doc_exists == 'true'
+      id: breaking_changes_document
+      shell: bash
+      run: |
+        EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+        echo "breaking_changes_document<<$EOF" >> $GITHUB_OUTPUT
+        echo "$(cat ./docs/breaking-changes/v${{ steps.is_breaking.outputs.next_major }}.md)" >> $GITHUB_OUTPUT
+        echo "$EOF" >> $GITHUB_OUTPUT
+        echo "${{ steps.breaking_changes_document.outputs.breaking_changes_document }}"
+    - name: Create a comment with breaking changes document
+      id: comment_breaking_changes_document
+      if: steps.check_breaking_changes_document.outputs.breaking_change_doc_exists == 'true'
+      uses: peter-evans/create-or-update-comment@v3
+      with:
+        issue-number: ${{ steps.find-pull-request.outputs.number }}
+        comment-author: "github-actions[bot]"
+        body-path: "./docs/breaking-changes/v${{ steps.is_breaking.outputs.next_major }}.md"
     - name: Check for release notes comment
       uses: peter-evans/find-comment@v2
       id: fc
@@ -54,7 +161,7 @@ runs:
         token: ${{ inputs.github-token }}
     - name: Comment release notes preview
       uses: peter-evans/create-or-update-comment@v1
-      if: steps.release-notes-preview.outputs.new_release_notes != '' && steps.find-pull-request.outputs.number != ''
+      if: steps.semantic.outputs.new_release_notes != '' && steps.find-pull-request.outputs.number != ''
       with:
         issue-number: ${{ steps.find-pull-request.outputs.number }}
         body: |
@@ -63,10 +170,10 @@ runs:
 
           ---
           <!-- release notes preview comment -->
-          ${{ steps.release-notes-preview.outputs.new_release_notes }}
+          ${{ steps.semantic.outputs.new_release_notes }}
     - name: Create no release created
       uses: peter-evans/create-or-update-comment@v1
-      if: steps.release-notes-preview.outputs.new_release_notes == '' && steps.find-pull-request.outputs.number != ''
+      if: steps.semantic.outputs.new_release_notes == '' && steps.find-pull-request.outputs.number != ''
       with:
         issue-number: ${{ steps.find-pull-request.outputs.number }}
         body: |
