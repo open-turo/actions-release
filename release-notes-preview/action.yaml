@@ -23,20 +23,16 @@ runs:
       uses: open-turo/action-setup-tools@v1
       with:
         node: 18.15.0
+    - name: Install dependencies
+      shell: bash
+      run: npm install '@open-turo/semantic-release-config@^1.4.0'
     - uses: jwalton/gh-find-current-pr@v1
       id: find-pull-request
       with:
         state: open
     - name: Generate release notes
       id: release-notes-preview
-      uses: cycjimmy/semantic-release-action@v3
-      env:
-        GITHUB_TOKEN: ${{ inputs.github-token }}
-      with:
-        ci: false
-        dry_run: true
-        extra_plugins: ${{ inputs.extra-plugins }}
-        semantic_version: ${{ inputs.semantic-version }}
+      uses: guilhermetod/semantic-release-notes-preview@v1.0.0
     - name: Check for release notes comment
       uses: peter-evans/find-comment@v2
       id: fc
@@ -54,7 +50,7 @@ runs:
         token: ${{ inputs.github-token }}
     - name: Comment release notes preview
       uses: peter-evans/create-or-update-comment@v1
-      if: steps.release-notes-preview.outputs.new_release_notes != '' && steps.find-pull-request.outputs.number != ''
+      if: steps.release-notes-preview.outputs.releaseNotes != '' && steps.find-pull-request.outputs.number != ''
       with:
         issue-number: ${{ steps.find-pull-request.outputs.number }}
         body: |
@@ -63,10 +59,10 @@ runs:
 
           ---
           <!-- release notes preview comment -->
-          ${{ steps.release-notes-preview.outputs.new_release_notes }}
+          ${{ steps.release-notes-preview.outputs.releaseNotes }}
     - name: Create no release created
       uses: peter-evans/create-or-update-comment@v1
-      if: steps.release-notes-preview.outputs.new_release_notes == '' && steps.find-pull-request.outputs.number != ''
+      if: steps.release-notes-preview.outputs.releaseNotes == '' && steps.find-pull-request.outputs.number != ''
       with:
         issue-number: ${{ steps.find-pull-request.outputs.number }}
         body: |
