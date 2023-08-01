@@ -1,0 +1,42 @@
+name: GitHub Action Release Lint
+description: GitHub Action that publishes a new release.
+inputs:
+  github-token:
+    required: true
+    description: GitHub token that can checkout the repository as well as create tags/releases against it. e.g. 'secrets.GITHUB_TOKEN'
+    default: ${{ github.token }}
+  extra-plugins:
+    required: false
+    description: Extra plugins for pre-install. You can also specify specifying version range for the extra plugins if you prefer.  Defaults to install @open-turo/semantic-release-config.
+    default: |
+      @open-turo/semantic-release-config@^1.4.0
+  semantic-version:
+    required: false
+    description: Specify what version of semantic release to use
+  template-url:
+    required: false
+    description: Breaking changes document template URL
+    default: https://raw.githubusercontent.com/open-turo/actions-release/main/templates/breaking-changes.md
+  enforce-breaking-changes-doc:
+    required: false
+    description: Enforce breaking changes document check
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    - name: Release notes preview
+      id: release-notes-preview
+      uses: open-turo/actions-release/release-notes-preview@v1
+      with:
+        github-token: ${{ inputs.github-token }}
+        extra-plugins: ${{ inputs.extra-plugins }}
+        semantic-version: ${{ inputs.semantic-version }}
+    - uses: open-turo/actions-release/enforce-breaking-changes-doc-check@f/add_breaking_changes_workflow
+      name: Check breaking changes document
+      if: ${{ inputs.enforce-breaking-changes-doc }} == 'true'
+      with:
+        github-token: ${{ inputs.github-token }}
+        extra-plugins: ${{ inputs.extra-plugins }}
+        semantic-version: ${{ inputs.semantic-version }}
+        template-url: ${{ inputs.template-url }}

@@ -1,0 +1,24 @@
+name: "Validate Breaking Change Doc Exists"
+description: "A simple custom action written in JavaScript, to validate a breaking change doc exits"
+inputs:
+  last-release-version:
+    required: true
+    description: "The last release version"
+  new-release-version:
+    required: true
+    description: "The new release version"
+  pull-request-id:
+    required: true
+    description: "Pull request id"
+  github-token:
+    required: true
+    description: GitHub token that can checkout the repository as well as create tags/releases against it. e.g. 'secrets.GITHUB-TOKEN'
+    default: ${{ github.token }}
+  repo:
+    required: false
+    description: "Github token"
+    default: ${{ github.repository }}
+
+runs:
+  using: "node16"
+  main: "dist/index.js"

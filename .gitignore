@@ -8,3 +8,7 @@ crash.log
 lint_commit_message
 
 Brewfile.lock.json
+
+node_modules/
+
+coverage/
