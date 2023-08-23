@@ -12,3 +12,5 @@ Brewfile.lock.json
 node_modules/
 
 coverage/
+
+.DS_Store
