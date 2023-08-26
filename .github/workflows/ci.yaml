@@ -1,10 +1,19 @@
 name: CI
 
 on:
-  pull_request:
-    branches: [main]
+  push:
 
 jobs:
+  release-notes:
+    name: Release notes preview
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: ./release-notes-preview
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -18,3 +27,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Test release
+        uses: ./semantic-release
+        with:
+          branches: ${{ github.ref_name }}
+          dry-run: true
+          extra-plugins: |
+            @open-turo/semantic-release-config

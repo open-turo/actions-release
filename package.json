@@ -1,0 +1,23 @@
+{
+  "author": "Turo engineering",
+  "description": "GitHub Actions for Releases",
+  "devDependencies": {
+    "lerna": "7.1.4"
+  },
+  "engines": {
+    "node": ">= 18.0.0"
+  },
+  "workspaces": [
+    "semantic-release"
+  ],
+  "license": "MIT",
+  "name": "@open-turo/actions-release",
+  "private": true,
+  "scripts": {
+    "build": "lerna run build",
+    "clean": "lerna run clean",
+    "lint": "lerna run lint",
+    "prepare": "npm run lint && npm run build",
+    "test": "lerna run test"
+  }
+}
