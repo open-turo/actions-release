@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "baseUrl": "./",
+    "declaration": true,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "lib": ["es2021"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "outDir": "lib",
+    "paths": {
+      "~/*": ["./src/*"],
+      "~test/*": ["./test/*"]
+    },
+    "plugins": [
+      {
+        "transform": "typescript-transform-paths"
+      },
+      {
+        "transform": "typescript-transform-paths",
+        "afterDeclarations": true
+      }
+    ],
+    "removeComments": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "target": "es2017"
+  },
+  "exclude": ["node_modules"],
+  "include": ["src", "test"]
+}

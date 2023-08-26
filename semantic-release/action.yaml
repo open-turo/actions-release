@@ -1,0 +1,54 @@
+name: "Action For Semantic Release"
+description: "GitHub Action for Semantic Release"
+author: "open-turo"
+branding:
+  icon: "package"
+  color: "orange"
+inputs:
+  github-token:
+    required: true
+    description: GitHub token that can checkout the repository as well as create tags/releases against it. e.g. 'secrets.GITHUB_TOKEN'
+    default: ${{ github.token }}
+  branches:
+    required: false
+    description: "Override the branches where semantic release runs on"
+  ci:
+    required: false
+    description: "Set to false to skip Continuous Integration environment verifications"
+  dry-run:
+    required: false
+    description: "Whether to run semantic release in `dry-run` mode. It will override the dryRun attribute in your configuration file"
+  extra-plugins:
+    required: false
+    description: "Extra plugins for pre-install. You can also specify specifying version range for the extra plugins if you prefer."
+  semantic-version:
+    required: false
+    description: "Specify what version of semantic release to use"
+outputs:
+  new-release-published:
+    description: "Whether a new release was published"
+    value: ${{ steps.semantic-release.outputs.new-release-published }}
+  new-release-notes:
+    description: "The release notes for the new release if any"
+    value: ${{ steps.semantic-release.outputs.new-release-notes }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Setup tools
+      uses: actions/setup-node@v3
+      with:
+        node-version: "18"
+    - name: Semantic-release
+      id: semantic-release
+      run: node ${{ github.action_path }}/dist/index.js
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        SEMANTIC_ACTION_DRY_RUN: ${{ inputs.dry-run }}
+        SEMANTIC_ACTION_EXTRA_PLUGINS: ${{ inputs.extra-plugins }}
+        SEMANTIC_ACTION_BRANCHES: ${{ inputs.branches }}
+        SEMANTIC_ACTION_SEMANTIC_VERSION: ${{ inputs.semantic-version }}
