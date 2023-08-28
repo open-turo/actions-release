@@ -18,6 +18,6 @@
     "clean": "lerna run clean",
     "lint": "lerna run lint",
     "prepare": "npm run lint && npm run build",
-    "test": "lerna run test"
+    "test": "lerna run test --"
   }
 }
