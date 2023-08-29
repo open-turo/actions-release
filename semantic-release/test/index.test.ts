@@ -101,7 +101,6 @@ describe("semantic-release", () => {
     expect(semanticReleaseMock).toHaveBeenCalledTimes(1);
     expect(semanticReleaseMock.mock.calls[0][0]).toMatchInlineSnapshot(`
       {
-        "branches": undefined,
         "ci": false,
         "dryRun": false,
       }

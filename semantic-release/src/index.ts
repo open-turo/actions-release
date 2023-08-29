@@ -104,11 +104,16 @@ export async function main() {
     const { default: semanticRelease } = (await _import(
       "semantic-release",
     )) as typeof import("semantic-release");
-    const result = await semanticRelease({
-      branches: inputs.branches,
-      ci: inputs.ci,
-      dryRun: inputs.dryRun,
-    });
+    const result = await semanticRelease(
+      // Remove any input that is undefined or null to not mess with config in files
+      Object.fromEntries(
+        Object.entries({
+          branches: inputs.branches,
+          ci: inputs.ci,
+          dryRun: inputs.dryRun,
+        }).filter(([, value]) => value !== undefined && value !== null),
+      ),
+    );
     if (result) {
       const { nextRelease } = result;
       if (nextRelease) {
