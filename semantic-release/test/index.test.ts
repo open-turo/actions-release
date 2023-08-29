@@ -37,7 +37,7 @@ const mockRelease = (
     gitHead: "test",
     gitTag: "test",
     name: "test",
-    version: "test",
+    version: "1.2.3-test",
   };
   semanticReleaseMock.mockResolvedValue({
     commits: [],
@@ -114,6 +114,22 @@ describe("semantic-release", () => {
         [
           "new-release-notes",
           "New Release notes",
+        ],
+        [
+          "new-release-version",
+          "1.2.3-test",
+        ],
+        [
+          "new-release-major-version",
+          1,
+        ],
+        [
+          "new-release-minor-version",
+          2,
+        ],
+        [
+          "new-release-patch-version",
+          3,
         ],
       ]
     `);

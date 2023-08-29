@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 
 import { error, info, setFailed, setOutput } from "@actions/core";
 import { getExecOutput } from "@actions/exec";
+import semver from "semver";
 
 // Hack to ensure that NCC and webpack don't replace the dynamic import
 // See https://github.com/vercel/ncc/issues/935#issuecomment-1189850042
@@ -16,6 +17,10 @@ const __dirname = path.dirname(__filename);
 const OUTPUTS = {
   new_release_notes: "new-release-notes",
   new_release_published: "new-release-published",
+  new_release_version: "new-release-version",
+  new_release_major_version: "new-release-major-version",
+  new_release_minor_version: "new-release-minor-version",
+  new_release_patch_version: "new-release-patch-version",
 } as const;
 
 interface Inputs {
@@ -119,6 +124,19 @@ export async function main() {
       if (nextRelease) {
         setOutput(OUTPUTS.new_release_published, "true");
         setOutput(OUTPUTS.new_release_notes, nextRelease.notes);
+        setOutput(OUTPUTS.new_release_version, nextRelease.version);
+        setOutput(
+          OUTPUTS.new_release_major_version,
+          semver.major(nextRelease.version),
+        );
+        setOutput(
+          OUTPUTS.new_release_minor_version,
+          semver.minor(nextRelease.version),
+        );
+        setOutput(
+          OUTPUTS.new_release_patch_version,
+          semver.patch(nextRelease.version),
+        );
         info(
           `New release${inputs.dryRun ? " to be" : ""} published: ${
             nextRelease.version
