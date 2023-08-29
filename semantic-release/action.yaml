@@ -31,6 +31,18 @@ outputs:
   new-release-notes:
     description: "The release notes for the new release if any"
     value: ${{ steps.semantic-release.outputs.new-release-notes }}
+  new-release-version:
+    description: "Version of the new release"
+    value: ${{ steps.semantic-release.outputs.new-release-version }}
+  new-release-major-version:
+    description: "Major version of the new release"
+    value: ${{ steps.semantic-release.outputs.new-release-major-version }}
+  new-release-minor-version:
+    description: "Minor version of the new release"
+    value: ${{ steps.semantic-release.outputs.new-release-minor-version }}
+  new-release-patch-version:
+    description: "Patch version of the new release"
+    value: ${{ steps.semantic-release.outputs.new-release-patch-version }}
 
 runs:
   using: composite
