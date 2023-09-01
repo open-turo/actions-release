@@ -25,6 +25,8 @@ jobs:
   semantic-release:
     name: Release
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - uses: open-turo/actions-release/semantic-release@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
