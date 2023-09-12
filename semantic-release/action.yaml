@@ -43,6 +43,15 @@ outputs:
   new-release-patch-version:
     description: "Patch version of the new release"
     value: ${{ steps.semantic-release.outputs.new-release-patch-version }}
+  new-release-type:
+    description: "Type of the new release: 'prerelease' | 'prepatch' | 'patch' | 'preminor' | 'minor' | 'premajor' | 'major'"
+    value: ${{ steps.semantic-release.outputs.new-release-type }}
+  last-release-version:
+    description: "Version of the last release"
+    value: ${{ steps.semantic-release.outputs.last-release-version }}
+  last-release-major-version:
+    description: "Major version of the last release"
+    value: ${{ steps.semantic-release.outputs.last-release-major-version }}
 
 runs:
   using: composite

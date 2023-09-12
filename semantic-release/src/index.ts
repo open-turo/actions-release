@@ -15,12 +15,15 @@ const __dirname = path.dirname(__filename);
 
 // enum with the outputs that the action has. this should be the same as action.yaml
 const OUTPUTS = {
+  last_release_major_version: "last-release-major-version",
+  last_release_version: "last-release-version",
   new_release_notes: "new-release-notes",
   new_release_published: "new-release-published",
   new_release_version: "new-release-version",
   new_release_major_version: "new-release-major-version",
   new_release_minor_version: "new-release-minor-version",
   new_release_patch_version: "new-release-patch-version",
+  new_release_type: "new-release-type",
 } as const;
 
 interface Inputs {
@@ -120,9 +123,15 @@ export async function main() {
       ),
     );
     if (result) {
-      const { nextRelease } = result;
+      const { lastRelease, nextRelease } = result;
+      setOutput(OUTPUTS.last_release_version, lastRelease.version);
+      setOutput(
+        OUTPUTS.last_release_major_version,
+        semver.major(lastRelease.version),
+      );
       if (nextRelease) {
         setOutput(OUTPUTS.new_release_published, "true");
+        setOutput(OUTPUTS.new_release_type, nextRelease.type);
         setOutput(OUTPUTS.new_release_notes, nextRelease.notes);
         setOutput(OUTPUTS.new_release_version, nextRelease.version);
         setOutput(
