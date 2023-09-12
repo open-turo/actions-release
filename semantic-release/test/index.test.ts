@@ -108,8 +108,20 @@ describe("semantic-release", () => {
     expect(setOutputMock.mock.calls).toMatchInlineSnapshot(`
       [
         [
+          "last-release-version",
+          "1.2.3-test",
+        ],
+        [
+          "last-release-major-version",
+          1,
+        ],
+        [
           "new-release-published",
           "true",
+        ],
+        [
+          "new-release-type",
+          "prerelease",
         ],
         [
           "new-release-notes",

@@ -45,10 +45,17 @@ jobs:
 
 ## Outputs
 
-| parameter             | description                                  |
-| --------------------- | -------------------------------------------- |
-| new-release-published | Whether a new release was published          |
-| new-release-notes     | The release notes for the new release if any |
+| parameter                  | description                                                                                                      |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| new-release-published      | Whether a new release was published                                                                              |
+| new-release-notes          | The release notes for the new release if any                                                                     |
+| new-release-version        | Version of the new release                                                                                       |
+| new-release-major-version  | Major version of the new release                                                                                 |
+| new-release-minor-version  | Minor version of the new release                                                                                 |
+| new-release-patch-version  | Patch version of the new release                                                                                 |
+| new-release-type           | Type of the new release: 'prerelease' \| 'prepatch' \| 'patch' \| 'preminor' \| 'minor' \| 'premajor' \| 'major' |
+| last-release-version       | Version of the last release                                                                                      |
+| last-release-major-version | Major version of the last release                                                                                |
 
 ## Runs
 
