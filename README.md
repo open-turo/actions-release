@@ -13,13 +13,13 @@ GitHub Actions for handling releases.
 
 ## Actions
 
-### action: [`release-notes-preview`](./release-notes-preview)
+### action: [`release-notes-preview`](./lint-release-notes)
 
 Automatically generate release notes using semantic-release and post them as a comment in a pull request with the changes that would be included in the next version of the codebase if the pull request is merged.
 
-See usage [here](./release-notes-preview/README.md#usage).
+See usage [here](lint-release-notes/README.md#usage).
 
-Documentation is found [here](./release-notes-preview/README.md).
+Documentation is found [here](lint-release-notes/README.md).
 
 ## Get Help
 

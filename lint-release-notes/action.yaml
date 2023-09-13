@@ -1,13 +1,17 @@
 name: GitHub Action Release Notes Preview
 description: GitHub Action that publishes a new release.
 inputs:
+  checkout-repo:
+    required: false
+    description: Perform checkout as first step of action
+    default: "true"
   github-token:
     required: true
     description: GitHub token that can checkout the repository as well as create tags/releases against it. e.g. 'secrets.GITHUB_TOKEN'
     default: ${{ github.token }}
   enforce-breaking-changes-docs:
     required: false
-    description: Ensure that an appropriate `v<major-version>.md` doc has been created if there are breaking changes in the PR. Fail if required and missing.
+    description: Ensure that an appropriate `v<major-version>.md` doc has been created if there are breaking changes in the PR.
     default: "true"
   extra-plugins:
     required: false
@@ -20,10 +24,8 @@ inputs:
 runs:
   using: composite
   steps:
-    - shell: bash
-      run: |
-        echo "::error::DEPRECATION: open-turo/actions-release/release-notes-preview@v1 has been deprecated.  Please use open-turo/actions-release/lint-release-notes@v1."
     - uses: actions/checkout@v3
+      if: inputs.checkout-repo
       with:
         fetch-depth: 0
     - name: Setup tools
@@ -67,9 +69,6 @@ runs:
       with:
         issue-number: ${{ steps.find-pull-request.outputs.number }}
         body: |
-          # DEPRECATION:
-          This action has been deprecated.  Please update to use `open-turo/actions-release/lint-release-notes@v1`.
-
           ## Release notes preview
           Below is a preview of the release notes if your PR gets merged.
 
