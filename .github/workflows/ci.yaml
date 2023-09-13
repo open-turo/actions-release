@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: ./release-notes-preview
+      - uses: ./lint-release-notes
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
   lint:
