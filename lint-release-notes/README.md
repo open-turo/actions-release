@@ -29,7 +29,7 @@ jobs:
   lint-release-notes:
     name: Lint release notes
     steps:
-      - uses: open-turo/actions-release/lint-release-notes@v2
+      - uses: open-turo/actions-release/lint-release-notes@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
