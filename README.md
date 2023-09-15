@@ -13,17 +13,27 @@ GitHub Actions for handling releases.
 
 ## Actions
 
-### action: [`release-notes-preview`](./lint-release-notes)
+### action: [`lint-release-notes`](./lint-release-notes)
 
-Automatically generate release notes using semantic-release and post them as a comment in a pull request with the changes that would be included in the next version of the codebase if the pull request is merged.
+Automatically generate release notes using semantic-release and post them as a comment in a pull request with the
+changes that would be included in the next version of the codebase if the pull request is merged.
 
 See usage [here](lint-release-notes/README.md#usage).
 
 Documentation is found [here](lint-release-notes/README.md).
 
+### action: [`semantic-release`](./semantic-release)
+
+GitHub Action for Semantic Release
+
+See usage [here](semantic-release/README.md#usage).
+
+Documentation is found [here](semantic-release/README.md).
+
 ## Get Help
 
-Each Action has a detailed README for how to use it as referenced above. Please review Issues, post new Issues against this repository as needed.
+Each Action has a detailed README for how to use it as referenced above. Please review Issues, post new Issues against
+this repository as needed.
 
 ## Contributions
 
