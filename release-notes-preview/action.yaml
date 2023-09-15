@@ -107,10 +107,14 @@ runs:
         token: ${{ inputs.github-token }}
     - name: "Check File Existence"
       id: breaking-changes-file
+      if: inputs.enforce-breaking-changes-docs == 'true' && steps.find-pull-request.outputs.number != ''
       shell: bash
       run: |
+        echo "Checking for breaking changes file"
         set -e
         breaking_changes_file_missing=false
+        breaking_changes_file_default_content=false
+        breaking_changes_file_exists=false
         if [ "${{ steps.release-notes-preview.outputs.new-release-published }}" = "true" ]; then
           echo "new release published"
           if [ "${{ steps.release-notes-preview.outputs.new-release-type }}" = "major" ]; then
@@ -119,16 +123,30 @@ runs:
             # Check if the file exists
             if [ -e "$file_path" ]; then
               echo "breaking change doc $file_path exists."
+              expected_contents="Elaborate and add context to help the developer understand the changes"
+
+              breaking_changes_file_exists=true
+              if grep -Fq "$expected_contents" "$file_path"; then
+                echo "The file $file_path contains the default contents."
+                breaking_changes_file_default_content=true
+              fi
             else
               echo "breaking change doc $file_path does not exist."
               breaking_changes_file_missing=true
             fi
           fi
         fi
+        echo "Output: "
+        echo "   required=${breaking_changes_file_missing}"
+        echo "   default_content=${breaking_changes_file_default_content}"
+        echo "   exists=${breaking_changes_file_exists}"
         echo "required=${breaking_changes_file_missing}" >> $GITHUB_OUTPUT
+        echo "default_content=${breaking_changes_file_default_content}" >> $GITHUB_OUTPUT
+        echo "exists=${breaking_changes_file_exists}" >> $GITHUB_OUTPUT
+
     - name: Comment missing breaking changes doc
       uses: peter-evans/create-or-update-comment@v1
-      if: steps.breaking-changes-file.outputs.required && inputs.enforce-breaking-changes-docs && steps.find-pull-request.outputs.number != ''
+      if: steps.breaking-changes-file.outputs.required == 'true'
       with:
         issue-number: ${{ steps.find-pull-request.outputs.number }}
         body: |
@@ -143,15 +161,15 @@ runs:
           cat <<EOF > docs/breaking-changes/v${{ steps.release-notes-preview.outputs.new-release-major-version }}.md
           # Breaking changes in v${{ steps.release-notes-preview.outputs.new-release-major-version }}
 
-          [//]: # "Brief description of current major version release scope"
+          [//]: # "Brief description of current major version release scope. (remove comment after updating)"
 
           ## Description of changes
 
-          [//]: # "Elaborate and add context to help the developer understand the changes."
+          [//]: # "Elaborate and add context to help the developer understand the changes. (remove comment after updating)"
 
           ## Upgrade instructions
 
-          [//]: # "Required and suggested prerequisites, example code, etc."
+          [//]: # "Required and suggested prerequisites, example code, etc. (remove comment after updating)"
 
           EOF
           ```
@@ -159,8 +177,45 @@ runs:
 
           ---
           <!-- breaking changes comment -->
+    - name: Comment missing breaking changes doc
+      uses: peter-evans/create-or-update-comment@v1
+      if: steps.breaking-changes-file.outputs.default_content == 'true'
+      with:
+        issue-number: ${{ steps.find-pull-request.outputs.number }}
+        body: |
+          ## Error: breaking changes documentation must be updated
+          This pull request contains breaking changes, `docs/breaking-changes/v${{ steps.release-notes-preview.outputs.new-release-major-version }}.md` contains the default content.
+
+          Please update the content and push changes.
+
+          ---
+          <!-- breaking changes comment -->
+
+    - name: Get breaking changes doc
+      uses: mathiasvr/command-output@v2.0.0
+      id: breaking-changes-file-contents
+      if: steps.breaking-changes-file.outputs.exists == 'true'
+      with:
+        run: cat docs/breaking-changes/v${{ steps.release-notes-preview.outputs.new-release-major-version }}.md
+
+    - name: Append breaking changes doc to release notes preview
+      uses: peter-evans/create-or-update-comment@v1
+      if: steps.breaking-changes-file.outputs.exists == 'true'
+      with:
+        comment-id: ${{ steps.release-notes-preview-comment.outputs.comment-id }}
+        body: |
+          ---
+          ## Breaking changes file `docs/breaking-changes/v${{ steps.release-notes-preview.outputs.new-release-major-version }}.md`
+          ${{ steps.breaking-changes-file-contents.outputs.stdout }}
+          ---
+
     - name: Fail if we are checking for the breaking changes doc and it is missing
-      if: steps.breaking-changes-file.outputs.required && inputs.enforce-breaking-changes-docs
+      if: steps.breaking-changes-file.outputs.required == 'true'
       shell: bash
       run: |
-        echo "::error::Breaking changes document is missing. Expected: ``docs/breaking-changes/v${{ steps.release-notes-preview.outputs.new-release-major-version }}.md``" && exit 1
+        echo "::error::Breaking changes document is missing. Expected: 'docs/breaking-changes/v${{ steps.release-notes-preview.outputs.new-release-major-version }}.md'" && exit 1
+    - name: Fail if we are checking for the breaking changes doc and it has default content
+      if: steps.breaking-changes-file.outputs.default_content == 'true'
+      shell: bash
+      run: |
+        echo "::error::Breaking changes document has default content." && exit 1
