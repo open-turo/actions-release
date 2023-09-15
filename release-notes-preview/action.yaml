@@ -68,7 +68,7 @@ runs:
         issue-number: ${{ steps.find-pull-request.outputs.number }}
         body: |
           # DEPRECATION:
-          This action has been deprecated.  Please update to use `open-turo/actions-release/lint-release-notes@v1`.
+          This action has been deprecated.  Please update to use `open-turo/actions-release/lint-release-notes@v3`.
 
           ## Release notes preview
           Below is a preview of the release notes if your PR gets merged.
