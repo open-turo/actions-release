@@ -77,6 +77,7 @@ describe("semantic-release", () => {
     jest.resetAllMocks();
     delete process.env.SEMANTIC_ACTION_BRANCHES;
     delete process.env.SEMANTIC_ACTION_CI;
+    delete process.env.SEMANTIC_ACTION_DEBUG;
     delete process.env.SEMANTIC_ACTION_DRY_RUN;
     delete process.env.SEMANTIC_ACTION_EXTRA_PLUGINS;
     delete process.env.SEMANTIC_ACTION_SEMANTIC_VERSION;
@@ -102,6 +103,7 @@ describe("semantic-release", () => {
     expect(semanticReleaseMock.mock.calls[0][0]).toMatchInlineSnapshot(`
       {
         "ci": false,
+        "debug": false,
         "dryRun": false,
       }
     `);
@@ -150,6 +152,7 @@ describe("semantic-release", () => {
   test("runs semantic release with the extra options", async () => {
     process.env.SEMANTIC_ACTION_BRANCHES = "test";
     process.env.SEMANTIC_ACTION_CI = "true";
+    process.env.SEMANTIC_ACTION_DEBUG = "true";
     process.env.SEMANTIC_ACTION_DRY_RUN = "true";
     mockNpmInstall();
     mockRelease({ nextRelease: undefined });
@@ -159,6 +162,7 @@ describe("semantic-release", () => {
       {
         "branches": "test",
         "ci": true,
+        "debug": true,
         "dryRun": true,
       }
     `);

@@ -29,6 +29,7 @@ const OUTPUTS = {
 interface Inputs {
   branches?: string;
   ci: boolean;
+  debug: boolean;
   dryRun: boolean;
   extraPlugins: string[];
   semanticVersion?: string;
@@ -71,6 +72,7 @@ function getInputs(): Inputs {
     branches: process.env.SEMANTIC_ACTION_BRANCHES || undefined,
     ci: process.env.SEMANTIC_ACTION_CI === "true",
     dryRun: process.env.SEMANTIC_ACTION_DRY_RUN === "true",
+    debug: process.env.SEMANTIC_ACTION_DEBUG === "true",
     extraPlugins: (process.env.SEMANTIC_ACTION_EXTRA_PLUGINS || "")
       .replaceAll(/["']/g, "")
       .replaceAll(/[\n\r]/g, " ")
@@ -118,6 +120,7 @@ export async function main() {
         Object.entries({
           branches: inputs.branches,
           ci: inputs.ci,
+          debug: inputs.debug,
           dryRun: inputs.dryRun,
         }).filter(([, value]) => value !== undefined && value !== null),
       ),
