@@ -36,7 +36,7 @@ jobs:
 
 | parameter        | description                                                                                                                                                               | required | default                                   |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------- |
-| branches         | Override the branches where semantic release runs on                                                                                                                      | `false`  |                                           |
+| branches         | Override the branches where semantic release runs on. Accepts string or JSON object.                                                                                      | `false`  |                                           |
 | ci               | Set to false to skip Continuous Integration environment verifications                                                                                                     | `false`  |                                           |
 | dry-run          | Whether to run semantic release in `dry-run` mode. It will override the dryRun attribute in your configuration file                                                       | `false`  |                                           |
 | extra-plugins    | Extra plugins for pre-install. You can also specify specifying version range for the extra plugins if you prefer. Defaults to install @open-turo/semantic-release-config. | `false`  | @open-turo/semantic-release-config@^1.4.0 |

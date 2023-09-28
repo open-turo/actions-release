@@ -11,7 +11,7 @@ inputs:
     default: ${{ github.token }}
   branches:
     required: false
-    description: "Override the branches where semantic release runs on"
+    description: "Override the branches where semantic release runs on. Accepts a string or a JSON object."
   ci:
     required: false
     description: "Set to false to skip Continuous Integration environment verifications"
