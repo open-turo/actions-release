@@ -164,6 +164,30 @@ describe("semantic-release", () => {
     `);
   });
 
+  test("supports JSON `branches` input", async () => {
+    process.env.SEMANTIC_ACTION_BRANCHES =
+      '["test", {"name": "test-branch", "channel": "next"}]';
+    process.env.SEMANTIC_ACTION_CI = "true";
+    process.env.SEMANTIC_ACTION_DRY_RUN = "true";
+    mockNpmInstall();
+    mockRelease({ nextRelease: undefined });
+    await callAction();
+    expect(semanticReleaseMock).toHaveBeenCalledTimes(1);
+    expect(semanticReleaseMock.mock.calls[0][0]).toMatchInlineSnapshot(`
+      {
+        "branches": [
+          "test",
+          {
+            "channel": "next",
+            "name": "test-branch",
+          },
+        ],
+        "ci": true,
+        "dryRun": true,
+      }
+    `);
+  });
+
   test("installs the specified version of semantic release", async () => {
     process.env.SEMANTIC_ACTION_SEMANTIC_VERSION = "1.0.0";
     mockNpmInstall();
