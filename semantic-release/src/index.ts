@@ -27,7 +27,7 @@ const OUTPUTS = {
 } as const;
 
 interface Inputs {
-  branches?: string;
+  branches?: string | JSON;
   ci: boolean;
   dryRun: boolean;
   extraPlugins: string[];
@@ -67,8 +67,16 @@ async function runNpmInstall(packages: string[]) {
  * Get inputs from the environment
  */
 function getInputs(): Inputs {
+  let branches: string | JSON | undefined;
+  try {
+    branches =
+      process.env.SEMANTIC_ACTION_BRANCHES &&
+      (JSON.parse(process.env.SEMANTIC_ACTION_BRANCHES) as JSON);
+  } catch {
+    branches = process.env.SEMANTIC_ACTION_BRANCHES;
+  }
   return {
-    branches: process.env.SEMANTIC_ACTION_BRANCHES || undefined,
+    branches: branches || undefined,
     ci: process.env.SEMANTIC_ACTION_CI === "true",
     dryRun: process.env.SEMANTIC_ACTION_DRY_RUN === "true",
     extraPlugins: (process.env.SEMANTIC_ACTION_EXTRA_PLUGINS || "")
