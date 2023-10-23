@@ -1,5 +1,8 @@
 name: GitHub Action Release Notes Preview
-description: GitHub Action that publishes a new release.
+description: |-
+  Github action that lints release notes. It generates release notes using semantic-release and posts them as a comment in
+  a pull request with the changes that would be included in the next version of the codebase if the pull request is
+  merged. It also will fail if there are breaking changes and no `v<major-version>.md` doc has been created.
 inputs:
   checkout-repo:
     required: false

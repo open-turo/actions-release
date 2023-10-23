@@ -24,6 +24,9 @@ inputs:
   semantic-version:
     required: false
     description: "Specify what version of semantic release to use"
+  override-github-ref-name:
+    required: false
+    description: "Allow for override of github ref-name for running pull and repository dispatch triggered events"
 outputs:
   new-release-published:
     description: "Whether a new release was published"
@@ -62,7 +65,27 @@ runs:
         node-version: "18"
     - name: Semantic-release
       id: semantic-release
-      run: node ${{ github.action_path }}/dist/index.js
+      run: |
+        if [[ ! -z "${{ inputs.override-github-ref-name }}" ]]; then
+
+          # if the override-github-ref-name is main or master, error
+          if [[ "${{ inputs.override-github-ref-name }}" == "main" || "${{ inputs.override-github-ref-name }}" == "master" ]]; then
+            echo "::error::Cannot override to main or master branch"
+            exit 1
+          fi
+          echo "::notice::Overriding github ref to ${{ github.ref }}"
+          export GITHUB_REF=refs/heads/${{ inputs.override-github-ref-name }}
+          export GITHUB_REF_NAME=${{ inputs.override-github-ref-name }}
+          export GITHUB_SHA=$(git rev-parse HEAD)
+          export GITHUB_REF_TYPE=branch
+          export GITHUB_REF_PROTECTED="false"
+        fi
+
+        echo "::group::bash environment"
+        set
+        echo "::endgroup::"
+
+        node ${{ github.action_path }}/dist/index.js
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
