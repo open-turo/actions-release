@@ -1,13 +1,12 @@
 name: CI
 
 on:
-  push:
+  pull_request: {}
 
 jobs:
   release-notes:
     name: Release notes preview
     runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,7 +32,8 @@ jobs:
       - name: Test release
         uses: ./semantic-release
         with:
-          branches: ${{ github.ref_name }}
+          branches: ${{ github.event.pull_request.head.ref }}
+          override-github-ref-name: ${{ github.event.pull_request.head.ref }}
           dry-run: true
           extra-plugins: |
             @open-turo/semantic-release-config
