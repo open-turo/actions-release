@@ -38,3 +38,14 @@ this repository as needed.
 ## Contributions
 
 Please see [here](https://github.com/open-turo/contributions) for guidelines on how to contribute to this project.
+
+## Development
+
+### Documentation
+
+We are using [`action-docs`](https://github.com/npalm/action-docs) to keep our action documentation up to date. This is
+handled by a script that uses `npx` to run action-lint. To update documentation manually, run:
+
+```shell
+pre-commit run -a update-action-readme
+```
