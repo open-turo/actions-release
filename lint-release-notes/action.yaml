@@ -27,36 +27,60 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v3
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJSON(github) }}
+      shell: bash
+      run: echo "$GITHUB_CONTEXT"
+
+    - name: Set vars
+      id: source-vars
+      shell: bash
+      env:
+        event_name: ${{ github.event_name }}
+        pull_request_ref_name: ${{ github.event.pull_request.head.ref }}
+      run: |
+        echo "event_name=$event_name"
+
+        if [ "$event_name" == "pull_request" ]; then
+          branch=$pull_request_ref_name
+        else
+          echo "::error::Unsupported event type '$event_name'"
+          exit 1
+        fi
+
+        echo "branch=$branch"
+        echo "branch=$branch" >> $GITHUB_OUTPUT
+
+    - uses: actions/checkout@v4
       if: inputs.checkout-repo == 'true'
       with:
         fetch-depth: 0
+        ref: ${{ steps.source-vars.outputs.branch }}
+
     - name: Setup tools
       uses: open-turo/action-setup-tools@v1
       with:
         node: 18.16.1
-    - uses: jwalton/gh-find-current-pr@v1
-      id: find-pull-request
-      with:
-        state: open
     - name: Generate release notes
       id: release-notes-preview
       uses: open-turo/actions-release/semantic-release@v3
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       with:
-        branches: ${{ github.ref_name }}
+        branches: ${{ steps.source-vars.outputs.branch }}
         dry-run: true
         extra-plugins: ${{ inputs.extra-plugins }}
         semantic-version: ${{ inputs.semantic-version }}
+        override-github-ref-name: ${{ steps.source-vars.outputs.branch }}
 
     # Add release notes preview to PR
     - name: Check for release notes comment
       uses: peter-evans/find-comment@v2
       id: fc-release-notes
-      if: steps.find-pull-request.outputs.number != ''
+      if: github.event.pull_request.number != ''
       with:
-        issue-number: ${{ steps.find-pull-request.outputs.number }}
+        issue-number: ${{ github.event.pull_request.number }}
         comment-author: "github-actions[bot]"
         body-includes: "<!-- release notes preview comment -->"
     - name: Delete previous release note
@@ -69,9 +93,9 @@ runs:
     - name: Comment release notes preview
       id: release-notes-preview-comment
       uses: peter-evans/create-or-update-comment@v1
-      if: steps.release-notes-preview.outputs.new-release-notes != '' && steps.find-pull-request.outputs.number != ''
+      if: steps.release-notes-preview.outputs.new-release-notes != '' && github.event.pull_request.number != ''
       with:
-        issue-number: ${{ steps.find-pull-request.outputs.number }}
+        issue-number: ${{ github.event.pull_request.number }}
         body: |
           ## Release notes preview
           Below is a preview of the release notes if your PR gets merged.
@@ -81,9 +105,9 @@ runs:
           ${{ steps.release-notes-preview.outputs.new-release-notes }}
     - name: Create no release created
       uses: peter-evans/create-or-update-comment@v1
-      if: steps.release-notes-preview.outputs.new-release-notes == '' && steps.find-pull-request.outputs.number != ''
+      if: steps.release-notes-preview.outputs.new-release-notes == '' && github.event.pull_request.number != ''
       with:
-        issue-number: ${{ steps.find-pull-request.outputs.number }}
+        issue-number: ${{ github.event.pull_request.number }}
         body: |
           <!-- release notes preview comment -->
           ## Release notes preview
@@ -96,9 +120,9 @@ runs:
     - name: Check for breaking changes comment
       uses: peter-evans/find-comment@v2
       id: fc-breaking-changes
-      if: steps.find-pull-request.outputs.number != ''
+      if: github.event.pull_request.number != ''
       with:
-        issue-number: ${{ steps.find-pull-request.outputs.number }}
+        issue-number: ${{ github.event.pull_request.number }}
         comment-author: "github-actions[bot]"
         body-includes: "<!-- breaking changes comment -->"
     - name: Delete previous breaking changes comment
@@ -110,7 +134,7 @@ runs:
         token: ${{ inputs.github-token }}
     - name: "Check File Existence"
       id: breaking-changes-file
-      if: inputs.enforce-breaking-changes-docs == 'true' && steps.find-pull-request.outputs.number != ''
+      if: inputs.enforce-breaking-changes-docs == 'true' && github.event.pull_request.number != ''
       shell: bash
       run: |
         echo "Checking for breaking changes file"
@@ -151,7 +175,7 @@ runs:
       uses: peter-evans/create-or-update-comment@v1
       if: steps.breaking-changes-file.outputs.required == 'true'
       with:
-        issue-number: ${{ steps.find-pull-request.outputs.number }}
+        issue-number: ${{ github.event.pull_request.number }}
         body: |
           ## Error: missing breaking changes documentation
           This pull request contains breaking changes, but no documentation has been added to `docs/breaking-changes/v${{ steps.release-notes-preview.outputs.new-release-major-version }}.md`.
@@ -184,7 +208,7 @@ runs:
       uses: peter-evans/create-or-update-comment@v1
       if: steps.breaking-changes-file.outputs.default_content == 'true'
       with:
-        issue-number: ${{ steps.find-pull-request.outputs.number }}
+        issue-number: ${{ github.event.pull_request.number }}
         body: |
           ## Error: breaking changes documentation must be updated
           This pull request contains breaking changes, `docs/breaking-changes/v${{ steps.release-notes-preview.outputs.new-release-major-version }}.md` contains the default content.
