@@ -132,11 +132,13 @@ export async function main() {
     );
     if (result) {
       const { lastRelease, nextRelease } = result;
-      setOutput(OUTPUTS.last_release_version, lastRelease.version);
-      setOutput(
-        OUTPUTS.last_release_major_version,
-        semver.major(lastRelease.version),
-      );
+      if (lastRelease.version) {
+        setOutput(OUTPUTS.last_release_version, lastRelease.version);
+        setOutput(
+          OUTPUTS.last_release_major_version,
+          semver.major(lastRelease.version),
+        );
+      }
       if (nextRelease) {
         setOutput(OUTPUTS.new_release_published, "true");
         setOutput(OUTPUTS.new_release_type, nextRelease.type);
