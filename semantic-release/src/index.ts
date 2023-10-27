@@ -164,7 +164,10 @@ export async function main() {
       }
     }
   } catch (error: unknown) {
-    setFailed(error instanceof Error ? error : new Error(String(error)));
+    const wrapperError =
+      error instanceof Error ? error : new Error(String(error));
+    console.error(wrapperError);
+    setFailed(wrapperError);
     throw error;
   }
 }
