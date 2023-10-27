@@ -85,7 +85,7 @@ runs:
         set
         echo "::endgroup::"
 
-        node ${{ github.action_path }}/dist/index.js
+        DEBUG=* node ${{ github.action_path }}/dist/index.js
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
