@@ -29,9 +29,9 @@ jest.unstable_mockModule("@actions/core", () => ({
   setOutput: setOutputMock,
 }));
 
-const mockRelease = (
-  overrides: Partial<Awaited<ReturnType<typeof semanticRelease>>> = {},
-) => {
+type SemanticRelease = Awaited<ReturnType<typeof semanticRelease>>;
+
+const mockRelease = (overrides: Partial<SemanticRelease> = {}) => {
   const lastRelease = {
     channels: [],
     gitHead: "test",
@@ -115,6 +115,44 @@ describe("semantic-release", () => {
           "last-release-major-version",
           1,
         ],
+        [
+          "new-release-published",
+          "true",
+        ],
+        [
+          "new-release-type",
+          "prerelease",
+        ],
+        [
+          "new-release-notes",
+          "New Release notes",
+        ],
+        [
+          "new-release-version",
+          "1.2.3-test",
+        ],
+        [
+          "new-release-major-version",
+          1,
+        ],
+        [
+          "new-release-minor-version",
+          2,
+        ],
+        [
+          "new-release-patch-version",
+          3,
+        ],
+      ]
+    `);
+  });
+
+  test("doesn't set last release outputs if there is no last release", async () => {
+    mockNpmInstall();
+    mockRelease({ lastRelease: false } as unknown as SemanticRelease);
+    await callAction();
+    expect(setOutputMock.mock.calls).toMatchInlineSnapshot(`
+      [
         [
           "new-release-published",
           "true",
