@@ -27,12 +27,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Dump GitHub context
-      env:
-        GITHUB_CONTEXT: ${{ toJSON(github) }}
-      shell: bash
-      run: echo "$GITHUB_CONTEXT"
-
     - name: Set vars
       id: source-vars
       shell: bash
