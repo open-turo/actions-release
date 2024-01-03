@@ -35,7 +35,7 @@
     "prettier": "3.0.0",
     "prettier-2": "npm:prettier@^2",
     "rimraf": "5.0.1",
-    "semantic-release": "21.1.1",
+    "semantic-release": "22.0.12",
     "ts-jest": "29.1.1",
     "ts-node": "10.9.1",
     "ts-patch": "3.0.1",
@@ -44,7 +44,7 @@
     "typescript-transform-paths": "3.4.6"
   },
   "engines": {
-    "node": ">= 18"
+    "node": ">= 20"
   },
   "license": "MIT",
   "main": "lib/index.js",
