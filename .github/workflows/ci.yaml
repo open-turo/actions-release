@@ -16,7 +16,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           extra-plugins: |
-            @open-turo/semantic-release-config@4.0.3
+            @open-turo/semantic-release-config
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -25,7 +25,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           semantic-release-extra-plugins: |
-            @open-turo/semantic-release-config@4.0.3
+            @open-turo/semantic-release-config
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -40,4 +40,4 @@ jobs:
           override-github-ref-name: ${{ github.event.pull_request.head.ref }}
           dry-run: true
           extra-plugins: |
-            @open-turo/semantic-release-config@4.0.3
+            @open-turo/semantic-release-config
