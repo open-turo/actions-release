@@ -12,7 +12,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           semantic-release-extra-plugins: |
-            @open-turo/semantic-release-config@6.1.2
+            @open-turo/semantic-release-config
   test:
     name: Test
     runs-on: ubuntu-latest
