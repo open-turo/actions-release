@@ -17,12 +17,9 @@ jobs:
   update-dependencies:
     runs-on: ubuntu-latest
     name: Update dependencies
-    # TODO(shakefu): Figure out what's supposed to happen here after @tagoro9
-    # can explain wtf he was up to - remove the skip
-    if: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: ./
+      - uses: open-turo/action-renovate@v1
         with:
           github-token: ${{ secrets.OPEN_TURO_GITHUB_TOKEN }}
