@@ -55,7 +55,7 @@ runs:
     - name: Setup tools
       uses: open-turo/action-setup-tools@v1
       with:
-        node: 18.16.1
+        node: 20.12.1
     - name: Generate release notes
       id: release-notes-preview
       uses: open-turo/actions-release/semantic-release@v4
