@@ -4,19 +4,6 @@ on:
   pull_request: {}
 
 jobs:
-  release-notes:
-    name: Release notes preview
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: ./lint-release-notes
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          extra-plugins: |
-            @open-turo/semantic-release-config
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -25,7 +12,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           semantic-release-extra-plugins: |
-            @open-turo/semantic-release-config
+            @open-turo/semantic-release-config@6.1.2
   test:
     name: Test
     runs-on: ubuntu-latest
