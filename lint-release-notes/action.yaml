@@ -79,7 +79,7 @@ runs:
         body-includes: "<!-- release notes preview comment -->"
     - name: Delete previous release note
       if: steps.fc-release-notes.outputs.comment-id != ''
-      uses: jungwinter/comment@v1
+      uses: winterjung/comment@v1
       with:
         type: delete
         comment_id: ${{ steps.fc-release-notes.outputs.comment-id }}
@@ -121,7 +121,7 @@ runs:
         body-includes: "<!-- breaking changes comment -->"
     - name: Delete previous breaking changes comment
       if: steps.fc-breaking-changes.outputs.comment-id != ''
-      uses: jungwinter/comment@v1
+      uses: winterjung/comment@v1
       with:
         type: delete
         comment_id: ${{ steps.fc-breaking-changes.outputs.comment-id }}
