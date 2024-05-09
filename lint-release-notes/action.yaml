@@ -70,7 +70,7 @@ runs:
 
     # Add release notes preview to PR
     - name: Check for release notes comment
-      uses: peter-evans/find-comment@v2
+      uses: peter-evans/find-comment@v3
       id: fc-release-notes
       if: github.event.pull_request.number != ''
       with:
@@ -112,7 +112,7 @@ runs:
 
     # Ensure that a breaking changes doc has been created
     - name: Check for breaking changes comment
-      uses: peter-evans/find-comment@v2
+      uses: peter-evans/find-comment@v3
       id: fc-breaking-changes
       if: github.event.pull_request.number != ''
       with:
