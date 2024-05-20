@@ -1,7 +1,9 @@
-import { error, setFailed, setOutput } from "@actions/core";
-import { getExecOutput } from "@actions/exec";
+import type { error, setFailed, setOutput } from "@actions/core";
+import type { getExecOutput } from "@actions/exec";
 import { afterEach, jest } from "@jest/globals";
-import semanticRelease from "semantic-release";
+import type semanticRelease from "semantic-release";
+
+import type { main as Main } from "../src/index.js";
 
 /**
  * Mock calls to npm install and semantic release as this is just a unit test of the action
@@ -65,9 +67,7 @@ const mockNpmInstall = (
 };
 
 const callAction = async () => {
-  const { main } = (await import(
-    "../src/index"
-  )) as typeof import("../src/index.js");
+  const { main } = (await import("../src/index.js")) as { main: typeof Main };
   return main();
 };
 
