@@ -86,7 +86,7 @@ runs:
         token: ${{ inputs.github-token }}
     - name: Comment release notes preview
       id: release-notes-preview-comment
-      uses: peter-evans/create-or-update-comment@v1
+      uses: peter-evans/create-or-update-comment@v4
       if: steps.release-notes-preview.outputs.new-release-notes != '' && github.event.pull_request.number != ''
       with:
         issue-number: ${{ github.event.pull_request.number }}
@@ -98,7 +98,7 @@ runs:
           <!-- release notes preview comment -->
           ${{ steps.release-notes-preview.outputs.new-release-notes }}
     - name: Create no release created
-      uses: peter-evans/create-or-update-comment@v1
+      uses: peter-evans/create-or-update-comment@v4
       if: steps.release-notes-preview.outputs.new-release-notes == '' && github.event.pull_request.number != ''
       with:
         issue-number: ${{ github.event.pull_request.number }}
@@ -166,7 +166,7 @@ runs:
         echo "exists=${breaking_changes_file_exists}" >> $GITHUB_OUTPUT
 
     - name: Comment missing breaking changes doc
-      uses: peter-evans/create-or-update-comment@v1
+      uses: peter-evans/create-or-update-comment@v4
       if: steps.breaking-changes-file.outputs.required == 'true'
       with:
         issue-number: ${{ github.event.pull_request.number }}
@@ -199,7 +199,7 @@ runs:
           ---
           <!-- breaking changes comment -->
     - name: Comment missing breaking changes doc
-      uses: peter-evans/create-or-update-comment@v1
+      uses: peter-evans/create-or-update-comment@v4
       if: steps.breaking-changes-file.outputs.default_content == 'true'
       with:
         issue-number: ${{ github.event.pull_request.number }}
@@ -220,7 +220,7 @@ runs:
         run: cat docs/breaking-changes/v${{ steps.release-notes-preview.outputs.new-release-major-version }}.md
 
     - name: Append breaking changes doc to release notes preview
-      uses: peter-evans/create-or-update-comment@v1
+      uses: peter-evans/create-or-update-comment@v4
       if: steps.breaking-changes-file.outputs.exists == 'true'
       with:
         comment-id: ${{ steps.release-notes-preview-comment.outputs.comment-id }}
