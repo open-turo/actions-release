@@ -3,7 +3,8 @@ import { fileURLToPath } from "node:url";
 
 import { error, info, setFailed, setOutput } from "@actions/core";
 import { getExecOutput } from "@actions/exec";
-import semver from "semver";
+import type SemanticRelease from "semantic-release";
+import { major, minor, patch } from "semver";
 
 // Hack to ensure that NCC and webpack don't replace the dynamic import
 // See https://github.com/vercel/ncc/issues/935#issuecomment-1189850042
@@ -127,7 +128,7 @@ export async function main() {
   try {
     const { default: semanticRelease } = (await _import(
       "semantic-release",
-    )) as typeof import("semantic-release");
+    )) as { default: typeof SemanticRelease };
     const result = await semanticRelease(
       // Remove any input that is undefined or null to not mess with config in files
       Object.fromEntries(
@@ -144,7 +145,7 @@ export async function main() {
         setOutput(OUTPUTS.last_release_version, lastRelease.version);
         setOutput(
           OUTPUTS.last_release_major_version,
-          semver.major(lastRelease.version),
+          major(lastRelease.version),
         );
       }
       if (nextRelease) {
@@ -154,15 +155,15 @@ export async function main() {
         setOutput(OUTPUTS.new_release_version, nextRelease.version);
         setOutput(
           OUTPUTS.new_release_major_version,
-          semver.major(nextRelease.version),
+          major(nextRelease.version),
         );
         setOutput(
           OUTPUTS.new_release_minor_version,
-          semver.minor(nextRelease.version),
+          minor(nextRelease.version),
         );
         setOutput(
           OUTPUTS.new_release_patch_version,
-          semver.patch(nextRelease.version),
+          patch(nextRelease.version),
         );
         info(
           `New release${inputs.dryRun ? " to be" : ""} published: ${
