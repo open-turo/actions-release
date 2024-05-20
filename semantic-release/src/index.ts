@@ -41,18 +41,10 @@ interface Inputs {
  */
 async function runNpmInstall(packages: string[]) {
   info(`Installing packages in ${path.resolve(__dirname, "..")}`);
-  // Hotfix for v4 of this action. There was a major release of @open-turo/semantic-release-config that breaks this action
-  // If v4 of this action is asking to install that module, pin it to the latest version
-  const actualPackages = packages.map((package_) => {
-    if (package_.includes("@open-turo/semantic-release-config")) {
-      return "@open-turo/semantic-release-config@6.1.2";
-    }
-    return package_;
-  });
   const silentFlag = process.env.RUNNER_DEBUG === "1" ? "" : "--silent";
   const data = await getExecOutput(
     "npm",
-    ["install", ...actualPackages, "--no-audit", silentFlag],
+    ["install", ...packages, "--no-audit", silentFlag],
     {
       cwd: path.resolve(__dirname, ".."),
     },

@@ -264,26 +264,6 @@ describe("semantic-release", () => {
     `);
   });
 
-  test("pins @open-turo/semantic-release-config if asked as extra plugin", async () => {
-    process.env.SEMANTIC_ACTION_EXTRA_PLUGINS =
-      "@open-turo/semantic-release-config";
-    mockNpmInstall();
-    mockRelease({ nextRelease: undefined });
-    await callAction();
-    expect(getExecOutputMock).toHaveBeenCalledTimes(1);
-    const [cmd, arguments_] = getExecOutputMock.mock.calls[0];
-    expect(cmd).toMatchInlineSnapshot(`"npm"`);
-    expect(arguments_).toMatchInlineSnapshot(`
-      [
-        "install",
-        "semantic-release",
-        "@open-turo/semantic-release-config@6.1.2",
-        "--no-audit",
-        "--silent",
-      ]
-    `);
-  });
-
   test("propagates npm install errors", async () => {
     mockNpmInstall({
       exitCode: 1,
