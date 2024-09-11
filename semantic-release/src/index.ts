@@ -40,13 +40,16 @@ interface Inputs {
  * @param packages List of packages to install
  */
 async function runNpmInstall(packages: string[]) {
-  info(`Installing packages in ${path.resolve(__dirname, "..")}`);
+  // When the action is compiled with NCC this translates into the dist folder
+  // This is important so that there are no conflicts with any dev tool we are using
+  const installationPath = path.resolve(__dirname);
+  info(`Installing packages in ${installationPath}`);
   const silentFlag = process.env.RUNNER_DEBUG === "1" ? "" : "--silent";
   const data = await getExecOutput(
     "npm",
     ["install", ...packages, "--no-audit", silentFlag],
     {
-      cwd: path.resolve(__dirname, ".."),
+      cwd: path.resolve(installationPath),
     },
   );
   if (data.stderr !== "") {

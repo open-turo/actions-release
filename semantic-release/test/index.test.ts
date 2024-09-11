@@ -97,7 +97,7 @@ describe("semantic-release", () => {
         "--silent",
       ]
     `);
-    expect(options).toHaveProperty("cwd", expect.any(String));
+    expect(options).toHaveProperty("cwd", expect.stringContaining("/src"));
     expect(semanticReleaseMock).toHaveBeenCalledTimes(1);
     expect(semanticReleaseMock.mock.calls[0][0]).toMatchInlineSnapshot(`
       {
