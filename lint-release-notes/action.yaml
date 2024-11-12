@@ -53,7 +53,7 @@ runs:
         ref: ${{ steps.source-vars.outputs.branch }}
 
     - name: Setup tools
-      uses: open-turo/action-setup-tools@v1
+      uses: open-turo/action-setup-tools@v2
       with:
         node: 20.12.1
     - name: Generate release notes
