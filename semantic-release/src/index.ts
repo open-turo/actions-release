@@ -131,7 +131,7 @@ export async function main() {
           branches: inputs.branches,
           ci: inputs.ci,
           dryRun: inputs.dryRun,
-        }).filter(([, value]) => value !== undefined && value !== null),
+        }).filter(([, value]) => value != undefined),
       ),
     );
     if (result) {
