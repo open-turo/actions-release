@@ -58,7 +58,7 @@ runs:
         node: 20.12.1
     - name: Generate release notes
       id: release-notes-preview
-      uses: open-turo/actions-release/semantic-release@v4
+      uses: open-turo/actions-release/semantic-release@v5
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       with:
