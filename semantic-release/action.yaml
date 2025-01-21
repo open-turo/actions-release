@@ -27,6 +27,10 @@ inputs:
   override-github-ref-name:
     required: false
     description: "Allow for override of github ref-name for running pull and repository dispatch triggered events"
+  working-directory:
+    required: false
+    description: "The working directory where the action should run"
+    default: "."
 outputs:
   new-release-published:
     description: "Whether a new release was published"
@@ -85,6 +89,9 @@ runs:
         set
         echo "::endgroup::"
 
+        echo "Using working directory: ${{ inputs.working-directory }}"
+        cd ${{ inputs.working-directory }}
+
         node ${{ github.action_path }}/dist/index.js
       shell: bash
       env:
@@ -93,3 +100,4 @@ runs:
         SEMANTIC_ACTION_EXTRA_PLUGINS: ${{ inputs.extra-plugins }}
         SEMANTIC_ACTION_BRANCHES: ${{ inputs.branches }}
         SEMANTIC_ACTION_SEMANTIC_VERSION: ${{ inputs.semantic-version }}
+        SEMANTIC_ACTION_WORKING_DIRECTORY: ${{ inputs.working-directory }}
