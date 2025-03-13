@@ -60,7 +60,7 @@ async function runNpmInstall(packages: string[]) {
   }
   if (data.exitCode > 0) {
     const npmInstallError = new Error(
-      `npm install failed with exit code ${data.exitCode}`,
+      `npm install failed with exit code ${String(data.exitCode)}`,
     );
     setFailed(npmInstallError);
     throw npmInstallError;
@@ -175,7 +175,11 @@ export async function main() {
 
 if (__filename === process.argv[1]) {
   // eslint-disable-next-line unicorn/prefer-top-level-await
-  main().catch((error: Error) => {
-    setFailed(error.message);
+  main().catch((error: unknown) => {
+    if (error instanceof Error) {
+      setFailed(error.message);
+    } else {
+      setFailed(String(error));
+    }
   });
 }
