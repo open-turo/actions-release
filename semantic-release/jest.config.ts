@@ -7,7 +7,6 @@ const config = {
     "~test/*": ["./test/*"],
   },
   preset: "ts-jest/presets/default-esm",
-  prettierPath: require.resolve("prettier-2"),
   transform: {
     "^.+\\.tsx?$": [
       "ts-jest",
