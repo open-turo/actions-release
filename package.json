@@ -2,7 +2,7 @@
   "author": "Turo engineering",
   "description": "GitHub Actions for Releases",
   "devDependencies": {
-    "lerna": "8.2.1"
+    "lerna": "8.2.2"
   },
   "engines": {
     "node": ">= 20.0.0"
