@@ -1,9 +1,9 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import type SemanticRelease from "semantic-release";
 
 import { error, info, setFailed, setOutput } from "@actions/core";
 import { getExecOutput } from "@actions/exec";
-import type SemanticRelease from "semantic-release";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { major, minor, patch } from "semver";
 
 // Hack to ensure that NCC and webpack don't replace the dynamic import
@@ -18,93 +18,21 @@ const __dirname = path.dirname(__filename);
 const OUTPUTS = {
   last_release_major_version: "last-release-major-version",
   last_release_version: "last-release-version",
-  new_release_notes: "new-release-notes",
-  new_release_published: "new-release-published",
-  new_release_version: "new-release-version",
   new_release_major_version: "new-release-major-version",
   new_release_minor_version: "new-release-minor-version",
+  new_release_notes: "new-release-notes",
   new_release_patch_version: "new-release-patch-version",
+  new_release_published: "new-release-published",
   new_release_type: "new-release-type",
+  new_release_version: "new-release-version",
 } as const;
 
 interface Inputs {
-  branches?: string | JSON;
+  branches?: JSON | string;
   ci: boolean;
   dryRun: boolean;
   extraPlugins: string[];
   semanticVersion?: string;
-}
-
-/**
- * Run NPM install inside the `semantic-release` directory
- * @param packages List of packages to install
- */
-async function runNpmInstall(packages: string[]) {
-  // When the action is compiled with NCC this translates into the dist folder
-  // This is important so that there are no conflicts with any dev tool we are using
-  const installationPath = path.resolve(__dirname);
-  info(`Installing packages in ${installationPath}`);
-  const silentFlag = process.env.RUNNER_DEBUG === "1" ? "" : "--silent";
-  const data = await getExecOutput(
-    "npm",
-    ["install", ...packages, "--no-audit", silentFlag],
-    {
-      cwd: path.resolve(installationPath),
-    },
-  );
-  if (data.stderr !== "") {
-    error(data.stderr);
-  }
-  if (data.stdout !== "") {
-    info(data.stdout);
-  }
-  if (data.exitCode > 0) {
-    const npmInstallError = new Error(
-      `npm install failed with exit code ${String(data.exitCode)}`,
-    );
-    setFailed(npmInstallError);
-    throw npmInstallError;
-  }
-}
-
-/**
- * Get inputs from the environment
- */
-function getInputs(): Inputs {
-  let branches: string | JSON | undefined;
-  try {
-    branches =
-      process.env.SEMANTIC_ACTION_BRANCHES &&
-      (JSON.parse(process.env.SEMANTIC_ACTION_BRANCHES) as JSON);
-  } catch {
-    branches = process.env.SEMANTIC_ACTION_BRANCHES;
-  }
-  return {
-    branches: branches || undefined,
-    ci: process.env.SEMANTIC_ACTION_CI === "true",
-    dryRun: process.env.SEMANTIC_ACTION_DRY_RUN === "true",
-    extraPlugins: (process.env.SEMANTIC_ACTION_EXTRA_PLUGINS || "")
-      .replaceAll(/["']/g, "")
-      .replaceAll(/[\n\r]/g, " ")
-      .trim()
-      .split(" ")
-      .filter((package_) => package_ !== ""),
-    semanticVersion: process.env.SEMANTIC_ACTION_SEMANTIC_VERSION || undefined,
-  };
-}
-
-/**
- * Given the semantic version input return the right semantic-release package
- * to install (with the version if provided)
- * @param semanticVersion Semantic version to install
- */
-function getSemanticReleaseWithVersion(
-  semanticVersion: Inputs["semanticVersion"],
-): string {
-  const semanticReleasePackage = "semantic-release";
-  return semanticVersion
-    ? `${semanticReleasePackage}@${semanticVersion}`
-    : semanticReleasePackage;
 }
 
 /**
@@ -121,6 +49,7 @@ export async function main() {
     ...inputs.extraPlugins,
   ]);
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     const { default: semanticRelease } = (await _import(
       "semantic-release",
     )) as { default: typeof SemanticRelease };
@@ -170,6 +99,78 @@ export async function main() {
   } catch (error: unknown) {
     setFailed(error instanceof Error ? error : new Error(String(error)));
     throw error;
+  }
+}
+
+/**
+ * Get inputs from the environment
+ */
+function getInputs(): Inputs {
+  let branches: JSON | string | undefined;
+  try {
+    branches =
+      process.env.SEMANTIC_ACTION_BRANCHES &&
+      (JSON.parse(process.env.SEMANTIC_ACTION_BRANCHES) as JSON);
+  } catch {
+    branches = process.env.SEMANTIC_ACTION_BRANCHES;
+  }
+  return {
+    branches: branches || undefined,
+    ci: process.env.SEMANTIC_ACTION_CI === "true",
+    dryRun: process.env.SEMANTIC_ACTION_DRY_RUN === "true",
+    extraPlugins: (process.env.SEMANTIC_ACTION_EXTRA_PLUGINS || "")
+      .replaceAll(/["']/g, "")
+      .replaceAll(/[\n\r]/g, " ")
+      .trim()
+      .split(" ")
+      .filter((package_) => package_ !== ""),
+    semanticVersion: process.env.SEMANTIC_ACTION_SEMANTIC_VERSION || undefined,
+  };
+}
+
+/**
+ * Given the semantic version input return the right semantic-release package
+ * to install (with the version if provided)
+ * @param semanticVersion Semantic version to install
+ */
+function getSemanticReleaseWithVersion(
+  semanticVersion: Inputs["semanticVersion"],
+): string {
+  const semanticReleasePackage = "semantic-release";
+  return semanticVersion
+    ? `${semanticReleasePackage}@${semanticVersion}`
+    : semanticReleasePackage;
+}
+
+/**
+ * Run NPM install inside the `semantic-release` directory
+ * @param packages List of packages to install
+ */
+async function runNpmInstall(packages: string[]) {
+  // When the action is compiled with NCC this translates into the dist folder
+  // This is important so that there are no conflicts with any dev tool we are using
+  const installationPath = path.resolve(__dirname);
+  info(`Installing packages in ${installationPath}`);
+  const silentFlag = process.env.RUNNER_DEBUG === "1" ? "" : "--silent";
+  const data = await getExecOutput(
+    "npm",
+    ["install", ...packages, "--no-audit", silentFlag],
+    {
+      cwd: path.resolve(installationPath),
+    },
+  );
+  if (data.stderr !== "") {
+    error(data.stderr);
+  }
+  if (data.stdout !== "") {
+    info(data.stdout);
+  }
+  if (data.exitCode > 0) {
+    const npmInstallError = new Error(
+      `npm install failed with exit code ${String(data.exitCode)}`,
+    );
+    setFailed(npmInstallError);
+    throw npmInstallError;
   }
 }
 
