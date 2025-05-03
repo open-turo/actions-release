@@ -1,7 +1,8 @@
 import type { error, setFailed, setOutput } from "@actions/core";
 import type { getExecOutput } from "@actions/exec";
-import { afterEach, jest } from "@jest/globals";
 import type semanticRelease from "semantic-release";
+
+import { afterEach, jest } from "@jest/globals";
 
 import type { main as Main } from "../src/index.js";
 

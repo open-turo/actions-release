@@ -1,9 +1,0 @@
-{
-  "extends": ["@open-turo/eslint-config-typescript"],
-  "rules": {
-    "import/no-extraneous-dependencies": [
-      "error",
-      { "devDependencies": ["test/**"] }
-    ]
-  }
-}
