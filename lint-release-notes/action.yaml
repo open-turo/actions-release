@@ -69,63 +69,41 @@ runs:
         override-github-ref-name: ${{ steps.source-vars.outputs.branch }}
 
     # Add release notes preview to PR
-    - name: Check for release notes comment
-      uses: peter-evans/find-comment@v3
-      id: fc-release-notes
-      if: github.event.pull_request.number != ''
-      with:
-        issue-number: ${{ github.event.pull_request.number }}
-        comment-author: "github-actions[bot]"
-        body-includes: "<!-- release notes preview comment -->"
-    - name: Delete previous release note
-      if: steps.fc-release-notes.outputs.comment-id != ''
-      uses: winterjung/comment@v1
-      with:
-        type: delete
-        comment_id: ${{ steps.fc-release-notes.outputs.comment-id }}
-        token: ${{ inputs.github-token }}
-    - name: Comment release notes preview
-      id: release-notes-preview-comment
-      uses: peter-evans/create-or-update-comment@v4
+    - name: Add release notes comment
+      uses: open-turo/action-conditional-pr-comment@v1
       if: steps.release-notes-preview.outputs.new-release-notes != '' && github.event.pull_request.number != ''
       with:
-        issue-number: ${{ github.event.pull_request.number }}
-        body: |
+        github-token: ${{ inputs.github-token }}
+        workflow: ADD
+        text-detector: "<!-- release notes preview comment -->"
+        edit-mode: replace
+        comment: |
           ## Release notes preview
           Below is a preview of the release notes if your PR gets merged.
 
           ---
           <!-- release notes preview comment -->
           ${{ steps.release-notes-preview.outputs.new-release-notes }}
+        comment-author: "github-actions[bot]"
+
     - name: Create no release created
-      uses: peter-evans/create-or-update-comment@v4
+      uses: open-turo/action-conditional-pr-comment@v1
       if: steps.release-notes-preview.outputs.new-release-notes == '' && github.event.pull_request.number != ''
       with:
-        issue-number: ${{ github.event.pull_request.number }}
-        body: |
+        github-token: ${{ inputs.github-token }}
+        workflow: ADD
+        text-detector: "<!-- release notes preview comment -->"
+        edit-mode: replace
+        comment: |
           <!-- release notes preview comment -->
           ## Release notes preview
           **_No_ new release will be created.**
 
           If you are expecting a release, you will need to either fix a bug or add a feature.
           Chores, CI, docs, refactoring, style and other changes will not trigger a release.
-
-    # Ensure that a breaking changes doc has been created
-    - name: Check for breaking changes comment
-      uses: peter-evans/find-comment@v3
-      id: fc-breaking-changes
-      if: github.event.pull_request.number != ''
-      with:
-        issue-number: ${{ github.event.pull_request.number }}
         comment-author: "github-actions[bot]"
-        body-includes: "<!-- breaking changes comment -->"
-    - name: Delete previous breaking changes comment
-      if: steps.fc-breaking-changes.outputs.comment-id != ''
-      uses: winterjung/comment@v1
-      with:
-        type: delete
-        comment_id: ${{ steps.fc-breaking-changes.outputs.comment-id }}
-        token: ${{ inputs.github-token }}
+
+    # Breaking changes comment
     - name: "Check File Existence"
       id: breaking-changes-file
       if: inputs.enforce-breaking-changes-docs == 'true' && github.event.pull_request.number != ''
@@ -166,11 +144,14 @@ runs:
         echo "exists=${breaking_changes_file_exists}" >> $GITHUB_OUTPUT
 
     - name: Comment missing breaking changes doc
-      uses: peter-evans/create-or-update-comment@v4
+      uses: open-turo/action-conditional-pr-comment@v1
       if: steps.breaking-changes-file.outputs.required == 'true'
       with:
-        issue-number: ${{ github.event.pull_request.number }}
-        body: |
+        github-token: ${{ inputs.github-token }}
+        workflow: ADD
+        text-detector: "<!-- breaking changes comment -->"
+        edit-mode: replace
+        comment: |
           ## Error: missing breaking changes documentation
           This pull request contains breaking changes, but no documentation has been added to `docs/breaking-changes/v${{ steps.release-notes-preview.outputs.new-release-major-version }}.md`.
 
@@ -199,11 +180,14 @@ runs:
           ---
           <!-- breaking changes comment -->
     - name: Comment missing breaking changes doc
-      uses: peter-evans/create-or-update-comment@v4
+      uses: open-turo/action-conditional-pr-comment@v1
       if: steps.breaking-changes-file.outputs.default_content == 'true'
       with:
-        issue-number: ${{ github.event.pull_request.number }}
-        body: |
+        github-token: ${{ inputs.github-token }}
+        workflow: ADD
+        text-detector: "<!-- breaking changes comment -->"
+        edit-mode: append
+        comment: |
           ## Error: breaking changes documentation must be updated
           This pull request contains breaking changes, `docs/breaking-changes/v${{ steps.release-notes-preview.outputs.new-release-major-version }}.md` contains the default content.
 
@@ -220,11 +204,14 @@ runs:
         run: cat docs/breaking-changes/v${{ steps.release-notes-preview.outputs.new-release-major-version }}.md
 
     - name: Append breaking changes doc to release notes preview
-      uses: peter-evans/create-or-update-comment@v4
+      uses: open-turo/action-conditional-pr-comment@v1
       if: steps.breaking-changes-file.outputs.exists == 'true'
       with:
-        comment-id: ${{ steps.release-notes-preview-comment.outputs.comment-id }}
-        body: |
+        github-token: ${{ inputs.github-token }}
+        workflow: ADD
+        text-detector: "<!-- release notes preview comment -->"
+        edit-mode: append
+        comment: |
           ---
           ## Breaking changes file `docs/breaking-changes/v${{ steps.release-notes-preview.outputs.new-release-major-version }}.md`
           ${{ steps.breaking-changes-file-contents.outputs.stdout }}
