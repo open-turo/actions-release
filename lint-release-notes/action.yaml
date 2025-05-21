@@ -75,7 +75,7 @@ runs:
       with:
         github-token: ${{ inputs.github-token }}
         workflow: ADD
-        text-detector: "<!-- release notes preview comment -->"
+        text-detector: "release notes preview comment"
         edit-mode: replace
         comment: |
           ## Release notes preview
@@ -92,7 +92,7 @@ runs:
       with:
         github-token: ${{ inputs.github-token }}
         workflow: ADD
-        text-detector: "<!-- release notes preview comment -->"
+        text-detector: "release notes preview comment"
         edit-mode: replace
         comment: |
           <!-- release notes preview comment -->
@@ -209,7 +209,7 @@ runs:
       with:
         github-token: ${{ inputs.github-token }}
         workflow: ADD
-        text-detector: "<!-- release notes preview comment -->"
+        text-detector: "release notes preview comment"
         edit-mode: append
         comment: |
           ---
