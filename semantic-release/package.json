@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@jest/globals": "30.0.4",
-    "@open-turo/eslint-config-typescript": "16.0.1",
+    "@open-turo/eslint-config-typescript": "17.0.12",
     "@types/jest": "30.0.0",
     "@types/node": "22.15.18",
     "eslint": "9.31.0",
