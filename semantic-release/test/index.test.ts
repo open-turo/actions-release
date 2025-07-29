@@ -4,18 +4,16 @@ import type semanticRelease from "semantic-release";
 
 import { afterEach, jest } from "@jest/globals";
 
-import type { main as Main } from "../src/index.js";
-
 /**
  * Mock calls to npm install and semantic release as this is just a unit test of the action
  * Integration tests are part of the CI GHA workflow
  */
 
-const getExecOutputMock = jest.fn() as jest.Mock<typeof getExecOutput>;
-const semanticReleaseMock = jest.fn() as jest.Mock<typeof semanticRelease>;
-const setOutputMock = jest.fn() as jest.Mock<typeof setOutput>;
-const setFailedMock = jest.fn() as jest.Mock<typeof setFailed>;
-const errorMock = jest.fn() as jest.Mock<typeof error>;
+const getExecOutputMock = jest.fn<typeof getExecOutput>();
+const semanticReleaseMock = jest.fn<typeof semanticRelease>();
+const setOutputMock = jest.fn<typeof setOutput>();
+const setFailedMock = jest.fn<typeof setFailed>();
+const errorMock = jest.fn<typeof error>();
 
 jest.unstable_mockModule("@actions/exec", () => ({
   getExecOutput: getExecOutputMock,
@@ -68,7 +66,7 @@ const mockNpmInstall = (
 };
 
 const callAction = async () => {
-  const { main } = (await import("../src/index.js")) as { main: typeof Main };
+  const { main } = await import("../src/index.js");
   return main();
 };
 
@@ -150,7 +148,7 @@ describe("semantic-release", () => {
 
   test("doesn't set last release outputs if there is no last release", async () => {
     mockNpmInstall();
-    mockRelease({ lastRelease: false } as unknown as SemanticRelease);
+    mockRelease({ lastRelease: undefined });
     await callAction();
     expect(setOutputMock.mock.calls).toMatchInlineSnapshot(`
       [
