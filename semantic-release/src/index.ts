@@ -49,7 +49,7 @@ export async function main() {
     ...inputs.extraPlugins,
   ]);
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/consistent-type-assertions
     const { default: semanticRelease } = (await _import(
       "semantic-release",
     )) as { default: typeof SemanticRelease };
@@ -65,7 +65,7 @@ export async function main() {
     );
     if (result) {
       const { lastRelease, nextRelease } = result;
-      if (lastRelease.version) {
+      if (lastRelease?.version) {
         setOutput(OUTPUTS.last_release_version, lastRelease.version);
         setOutput(
           OUTPUTS.last_release_major_version,
@@ -110,6 +110,7 @@ function getInputs(): Inputs {
   try {
     branches =
       process.env.SEMANTIC_ACTION_BRANCHES &&
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       (JSON.parse(process.env.SEMANTIC_ACTION_BRANCHES) as JSON);
   } catch {
     branches = process.env.SEMANTIC_ACTION_BRANCHES;
