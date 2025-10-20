@@ -65,17 +65,26 @@ runs:
         node-version: "22"
     - name: Semantic-release
       id: semantic-release
+      env:
+        OVERRIDE_REF_NAME: ${{ inputs.override-github-ref-name }}
+        GITHUB_REF_VALUE: ${{ github.ref }}
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        SEMANTIC_ACTION_DRY_RUN: ${{ inputs.dry-run }}
+        SEMANTIC_ACTION_EXTRA_PLUGINS: ${{ inputs.extra-plugins }}
+        SEMANTIC_ACTION_BRANCHES: ${{ inputs.branches }}
+        SEMANTIC_ACTION_SEMANTIC_VERSION: ${{ inputs.semantic-version }}
       run: |
-        if [[ ! -z "${{ inputs.override-github-ref-name }}" ]]; then
+        if [[ ! -z "$OVERRIDE_REF_NAME" ]]; then
 
           # if the override-github-ref-name is main or master, error
-          if [[ "${{ inputs.override-github-ref-name }}" == "main" || "${{ inputs.override-github-ref-name }}" == "master" ]]; then
+          if [[ "$OVERRIDE_REF_NAME" == "main" || "$OVERRIDE_REF_NAME" == "master" ]]; then
             echo "::error::Cannot override to main or master branch"
             exit 1
           fi
-          echo "::notice::Overriding github ref to ${{ github.ref }}"
-          export GITHUB_REF=refs/heads/${{ inputs.override-github-ref-name }}
-          export GITHUB_REF_NAME=${{ inputs.override-github-ref-name }}
+          echo "::notice::Overriding github ref to $GITHUB_REF_VALUE"
+          export GITHUB_REF=refs/heads/$OVERRIDE_REF_NAME
+          export GITHUB_REF_NAME=$OVERRIDE_REF_NAME
           export GITHUB_SHA=$(git rev-parse HEAD)
           export GITHUB_REF_TYPE=branch
           export GITHUB_REF_PROTECTED="false"
@@ -85,11 +94,5 @@ runs:
         set
         echo "::endgroup::"
 
-        node ${{ github.action_path }}/dist/index.js
+        node $GITHUB_ACTION_PATH/dist/index.js
       shell: bash
-      env:
-        GITHUB_TOKEN: ${{ inputs.github-token }}
-        SEMANTIC_ACTION_DRY_RUN: ${{ inputs.dry-run }}
-        SEMANTIC_ACTION_EXTRA_PLUGINS: ${{ inputs.extra-plugins }}
-        SEMANTIC_ACTION_BRANCHES: ${{ inputs.branches }}
-        SEMANTIC_ACTION_SEMANTIC_VERSION: ${{ inputs.semantic-version }}
