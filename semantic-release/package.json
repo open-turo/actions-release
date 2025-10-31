@@ -12,7 +12,7 @@
     "@jest/globals": "30.2.0",
     "@open-turo/eslint-config-typescript": "18.1.8",
     "@types/jest": "30.0.0",
-    "@types/node": "22.18.13",
+    "@types/node": "24.9.2",
     "eslint": "9.39.0",
     "jest": "30.2.0",
     "prettier": "3.6.2",
