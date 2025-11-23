@@ -46,7 +46,7 @@ runs:
         echo "branch=$branch"
         echo "branch=$branch" >> $GITHUB_OUTPUT
 
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       if: inputs.checkout-repo == 'true'
       with:
         fetch-depth: 0
