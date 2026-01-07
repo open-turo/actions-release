@@ -10,10 +10,10 @@
   },
   "devDependencies": {
     "@jest/globals": "30.2.0",
-    "@open-turo/eslint-config-typescript": "18.1.20",
+    "@open-turo/eslint-config-typescript": "18.1.30",
     "@types/jest": "30.0.0",
-    "@types/node": "24.10.1",
-    "eslint": "9.39.1",
+    "@types/node": "24.10.4",
+    "eslint": "9.39.2",
     "jest": "30.2.0",
     "prettier": "3.7.4",
     "rimraf": "6.1.2",
@@ -23,7 +23,7 @@
     "ts-patch": "3.3.0",
     "tsc-watch": "7.2.0",
     "typescript": "5.9.3",
-    "typescript-transform-paths": "3.5.5"
+    "typescript-transform-paths": "3.5.6"
   },
   "engines": {
     "node": ">= 20"
