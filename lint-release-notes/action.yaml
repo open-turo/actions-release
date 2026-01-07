@@ -187,7 +187,7 @@ runs:
         github-token: ${{ inputs.github-token }}
         workflow: ADD
         text-detector: "<!-- breaking changes comment -->"
-        edit-mode: append
+        edit-mode: replace
         comment: |
           ## Error: breaking changes documentation must be updated
           This pull request contains breaking changes, `docs/breaking-changes/v${{ steps.release-notes-preview.outputs.new-release-major-version }}.md` contains the default content.
