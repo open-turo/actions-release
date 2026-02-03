@@ -8,8 +8,25 @@ import { major, minor, patch } from "semver";
 
 // Hack to ensure that NCC and webpack don't replace the dynamic import
 // See https://github.com/vercel/ncc/issues/935#issuecomment-1189850042
-// eslint-disable-next-line @typescript-eslint/no-implied-eval
-const _import = new Function("p", "return import(p)");
+// eslint-disable-next-line @typescript-eslint/no-implied-eval, @typescript-eslint/consistent-type-assertions
+const _dynamicImport = new Function("p", "return import(p)") as (
+  modulePath: string,
+) => Promise<unknown>;
+
+// Exported for testing - allows mocking the dynamic import
+export let _import: (modulePath: string) => Promise<unknown> = _dynamicImport;
+
+// For testing - reset to the default dynamic import
+export function _resetImport() {
+  _import = _dynamicImport;
+}
+
+// For testing - allows overriding the dynamic import function
+export function _setImport(
+  importFunction: (modulePath: string) => Promise<unknown>,
+) {
+  _import = importFunction;
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -49,7 +66,7 @@ export async function main() {
     ...inputs.extraPlugins,
   ]);
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/consistent-type-assertions
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const { default: semanticRelease } = (await _import(
       "semantic-release",
     )) as { default: typeof SemanticRelease };

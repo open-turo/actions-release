@@ -2,33 +2,37 @@ import type { error, setFailed, setOutput } from "@actions/core";
 import type { getExecOutput } from "@actions/exec";
 import type semanticRelease from "semantic-release";
 
-import { afterEach, jest } from "@jest/globals";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 /**
  * Mock calls to npm install and semantic release as this is just a unit test of the action
  * Integration tests are part of the CI GHA workflow
  */
 
-const getExecOutputMock = jest.fn<typeof getExecOutput>();
-const semanticReleaseMock = jest.fn<typeof semanticRelease>();
-const setOutputMock = jest.fn<typeof setOutput>();
-const setFailedMock = jest.fn<typeof setFailed>();
-const errorMock = jest.fn<typeof error>();
+// Use vi.hoisted to ensure mock functions are available when vi.mock is hoisted
+const { errorMock, getExecOutputMock, setFailedMock, setOutputMock } =
+  vi.hoisted(() => ({
+    errorMock: vi.fn<typeof error>(),
+    getExecOutputMock: vi.fn<typeof getExecOutput>(),
+    setFailedMock: vi.fn<typeof setFailed>(),
+    setOutputMock: vi.fn<typeof setOutput>(),
+  }));
 
-jest.unstable_mockModule("@actions/exec", () => ({
+const semanticReleaseMock = vi.fn<typeof semanticRelease>();
+
+vi.mock("@actions/exec", () => ({
   getExecOutput: getExecOutputMock,
 }));
 
-jest.unstable_mockModule("semantic-release", () => ({
-  default: semanticReleaseMock,
-}));
-
-jest.unstable_mockModule("@actions/core", () => ({
+vi.mock("@actions/core", () => ({
   error: errorMock,
-  info: jest.fn(),
+  info: vi.fn(),
   setFailed: setFailedMock,
   setOutput: setOutputMock,
 }));
+
+// Import after mocks are set up
+const { _resetImport, _setImport, main } = await import("../src/index.js");
 
 type SemanticRelease = Awaited<ReturnType<typeof semanticRelease>>;
 
@@ -65,15 +69,16 @@ const mockNpmInstall = (
   });
 };
 
-const callAction = async () => {
-  const { main } = await import("../src/index.js");
-  return main();
-};
-
 describe("semantic-release", () => {
+  beforeEach(() => {
+    // Mock the dynamic import for semantic-release
+    _setImport(() => Promise.resolve({ default: semanticReleaseMock }));
+  });
+
   afterEach(() => {
-    jest.clearAllMocks();
-    jest.resetAllMocks();
+    vi.clearAllMocks();
+    vi.resetAllMocks();
+    _resetImport();
     delete process.env.SEMANTIC_ACTION_BRANCHES;
     delete process.env.SEMANTIC_ACTION_CI;
     delete process.env.SEMANTIC_ACTION_DRY_RUN;
@@ -84,7 +89,7 @@ describe("semantic-release", () => {
   test("runs semantic release", async () => {
     mockNpmInstall();
     mockRelease();
-    await callAction();
+    await main();
     expect(getExecOutputMock).toHaveBeenCalledTimes(1);
     const [cmd, arguments_, options] = getExecOutputMock.mock.calls[0];
     expect(cmd).toMatchInlineSnapshot(`"npm"`);
@@ -149,7 +154,7 @@ describe("semantic-release", () => {
   test("doesn't set last release outputs if there is no last release", async () => {
     mockNpmInstall();
     mockRelease({ lastRelease: undefined });
-    await callAction();
+    await main();
     expect(setOutputMock.mock.calls).toMatchInlineSnapshot(`
       [
         [
@@ -190,7 +195,7 @@ describe("semantic-release", () => {
     process.env.SEMANTIC_ACTION_DRY_RUN = "true";
     mockNpmInstall();
     mockRelease({ nextRelease: undefined });
-    await callAction();
+    await main();
     expect(semanticReleaseMock).toHaveBeenCalledTimes(1);
     expect(semanticReleaseMock.mock.calls[0][0]).toMatchInlineSnapshot(`
       {
@@ -208,7 +213,7 @@ describe("semantic-release", () => {
     process.env.SEMANTIC_ACTION_DRY_RUN = "true";
     mockNpmInstall();
     mockRelease({ nextRelease: undefined });
-    await callAction();
+    await main();
     expect(semanticReleaseMock).toHaveBeenCalledTimes(1);
     expect(semanticReleaseMock.mock.calls[0][0]).toMatchInlineSnapshot(`
       {
@@ -229,7 +234,7 @@ describe("semantic-release", () => {
     process.env.SEMANTIC_ACTION_SEMANTIC_VERSION = "1.0.0";
     mockNpmInstall();
     mockRelease({ nextRelease: undefined });
-    await callAction();
+    await main();
     expect(getExecOutputMock).toHaveBeenCalledTimes(1);
     const [cmd, arguments_] = getExecOutputMock.mock.calls[0];
     expect(cmd).toMatchInlineSnapshot(`"npm"`);
@@ -247,7 +252,7 @@ describe("semantic-release", () => {
     process.env.SEMANTIC_ACTION_EXTRA_PLUGINS = "test@1.0.0\n'test-2'";
     mockNpmInstall();
     mockRelease({ nextRelease: undefined });
-    await callAction();
+    await main();
     expect(getExecOutputMock).toHaveBeenCalledTimes(1);
     const [cmd, arguments_] = getExecOutputMock.mock.calls[0];
     expect(cmd).toMatchInlineSnapshot(`"npm"`);
@@ -268,7 +273,7 @@ describe("semantic-release", () => {
       exitCode: 1,
       stderr: "Error installing semantic-release",
     });
-    await expect(callAction()).rejects.toMatchInlineSnapshot(
+    await expect(main()).rejects.toMatchInlineSnapshot(
       `[Error: npm install failed with exit code 1]`,
     );
     expect(errorMock).toHaveBeenCalled();
@@ -283,7 +288,7 @@ describe("semantic-release", () => {
   test("propagates any semantic release error", async () => {
     mockNpmInstall();
     semanticReleaseMock.mockRejectedValue(new Error("Semantic release failed"));
-    await expect(callAction()).rejects.toMatchInlineSnapshot(
+    await expect(main()).rejects.toMatchInlineSnapshot(
       `[Error: Semantic release failed]`,
     );
     expect(setFailedMock).toHaveBeenCalled();
