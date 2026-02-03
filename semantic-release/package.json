@@ -2,7 +2,7 @@
   "author": "Turo engineering",
   "description": "GitHub Action for Semantic Release",
   "dependencies": {
-    "@actions/core": "^2.0.0",
+    "@actions/core": "^3.0.0",
     "@actions/exec": "^3.0.0",
     "@actions/github": "^7.0.0",
     "@vercel/ncc": "^0.38.1",
