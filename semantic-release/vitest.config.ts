@@ -8,7 +8,10 @@ export default defineConfig({
       "~/": new URL("src/", import.meta.url).pathname,
     },
     coverage: {
-      reporter: ["lcov", "html"],
+      exclude: ["test/**", "vitest.config.ts"],
+      include: ["src/**/*.ts"],
+      provider: "v8",
+      reporter: ["lcov", "html", "text"],
       reportsDirectory: "reports/coverage",
     },
     include: ["test/**/*.test.ts", "src/**/*.test.ts"],
