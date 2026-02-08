@@ -9,9 +9,9 @@
     "semver": "^7.7.3"
   },
   "devDependencies": {
-    "@open-turo/eslint-config-typescript": "18.1.37",
+    "@open-turo/eslint-config-typescript": "18.1.38",
     "@vitest/coverage-v8": "4.0.18",
-    "@types/node": "24.10.10",
+    "@types/node": "24.10.12",
     "eslint": "9.39.2",
     "prettier": "3.8.1",
     "rimraf": "6.1.2",
