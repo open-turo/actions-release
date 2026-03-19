@@ -152,6 +152,7 @@ runs:
         workflow: ADD
         text-detector: "<!-- breaking changes comment -->"
         edit-mode: replace
+        comment-author: "github-actions[bot]"
         comment: |
           ## Error: missing breaking changes documentation
           This pull request contains breaking changes, but no documentation has been added to `docs/breaking-changes/v${{ steps.release-notes-preview.outputs.new-release-major-version }}.md`.
@@ -188,6 +189,7 @@ runs:
         workflow: ADD
         text-detector: "<!-- breaking changes comment -->"
         edit-mode: replace
+        comment-author: "github-actions[bot]"
         comment: |
           ## Error: breaking changes documentation must be updated
           This pull request contains breaking changes, `docs/breaking-changes/v${{ steps.release-notes-preview.outputs.new-release-major-version }}.md` contains the default content.
