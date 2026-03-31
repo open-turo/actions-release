@@ -63,6 +63,8 @@ export async function main() {
   );
   await runNpmInstall([
     getSemanticReleaseWithVersion(inputs.semanticVersion),
+    // Workaround lodash-es@4.18.0 has a broken import (assignWith undefined).
+    "lodash-es@4.17.23",
     ...inputs.extraPlugins,
   ]);
   try {

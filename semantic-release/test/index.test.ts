@@ -97,6 +97,7 @@ describe("semantic-release", () => {
       [
         "install",
         "semantic-release",
+        "lodash-es@4.17.23",
         "--no-audit",
         "--silent",
       ]
@@ -242,6 +243,7 @@ describe("semantic-release", () => {
       [
         "install",
         "semantic-release@1.0.0",
+        "lodash-es@4.17.23",
         "--no-audit",
         "--silent",
       ]
@@ -260,6 +262,7 @@ describe("semantic-release", () => {
       [
         "install",
         "semantic-release",
+        "lodash-es@4.17.23",
         "test@1.0.0",
         "test-2",
         "--no-audit",
