@@ -62,7 +62,7 @@ runs:
     - name: Setup tools
       uses: actions/setup-node@v6
       with:
-        node-version: "24.14.1"
+        node-version: "24.15.0"
     - name: Semantic-release
       id: semantic-release
       env:
