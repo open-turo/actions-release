@@ -91,7 +91,9 @@ describe("semantic-release", () => {
     mockRelease();
     await main();
     expect(getExecOutputMock).toHaveBeenCalledTimes(1);
-    const [cmd, arguments_, options] = getExecOutputMock.mock.calls[0];
+    const call = getExecOutputMock.mock.calls.at(0);
+    expect(call).toBeDefined();
+    const [cmd, arguments_, options] = call ?? [];
     expect(cmd).toMatchInlineSnapshot(`"npm"`);
     expect(arguments_).toMatchInlineSnapshot(`
       [
@@ -104,7 +106,7 @@ describe("semantic-release", () => {
     `);
     expect(options).toHaveProperty("cwd", expect.stringContaining("/src"));
     expect(semanticReleaseMock).toHaveBeenCalledTimes(1);
-    expect(semanticReleaseMock.mock.calls[0][0]).toMatchInlineSnapshot(`
+    expect(semanticReleaseMock.mock.calls.at(0)?.[0]).toMatchInlineSnapshot(`
       {
         "ci": false,
         "dryRun": false,
@@ -198,7 +200,7 @@ describe("semantic-release", () => {
     mockRelease({ nextRelease: undefined });
     await main();
     expect(semanticReleaseMock).toHaveBeenCalledTimes(1);
-    expect(semanticReleaseMock.mock.calls[0][0]).toMatchInlineSnapshot(`
+    expect(semanticReleaseMock.mock.calls.at(0)?.[0]).toMatchInlineSnapshot(`
       {
         "branches": "test",
         "ci": true,
@@ -216,7 +218,7 @@ describe("semantic-release", () => {
     mockRelease({ nextRelease: undefined });
     await main();
     expect(semanticReleaseMock).toHaveBeenCalledTimes(1);
-    expect(semanticReleaseMock.mock.calls[0][0]).toMatchInlineSnapshot(`
+    expect(semanticReleaseMock.mock.calls.at(0)?.[0]).toMatchInlineSnapshot(`
       {
         "branches": [
           "test",
@@ -237,7 +239,9 @@ describe("semantic-release", () => {
     mockRelease({ nextRelease: undefined });
     await main();
     expect(getExecOutputMock).toHaveBeenCalledTimes(1);
-    const [cmd, arguments_] = getExecOutputMock.mock.calls[0];
+    const installCall = getExecOutputMock.mock.calls.at(0);
+    expect(installCall).toBeDefined();
+    const [cmd, arguments_] = installCall ?? [];
     expect(cmd).toMatchInlineSnapshot(`"npm"`);
     expect(arguments_).toMatchInlineSnapshot(`
       [
@@ -256,7 +260,9 @@ describe("semantic-release", () => {
     mockRelease({ nextRelease: undefined });
     await main();
     expect(getExecOutputMock).toHaveBeenCalledTimes(1);
-    const [cmd, arguments_] = getExecOutputMock.mock.calls[0];
+    const pluginCall = getExecOutputMock.mock.calls.at(0);
+    expect(pluginCall).toBeDefined();
+    const [cmd, arguments_] = pluginCall ?? [];
     expect(cmd).toMatchInlineSnapshot(`"npm"`);
     expect(arguments_).toMatchInlineSnapshot(`
       [
@@ -281,7 +287,7 @@ describe("semantic-release", () => {
     );
     expect(errorMock).toHaveBeenCalled();
     expect(setFailedMock).toHaveBeenCalled();
-    expect(errorMock.mock.calls[0]).toMatchInlineSnapshot(`
+    expect(errorMock.mock.calls.at(0)).toMatchInlineSnapshot(`
       [
         "Error installing semantic-release",
       ]
