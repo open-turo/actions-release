@@ -213,7 +213,8 @@ runs:
         github-token: ${{ inputs.github-token }}
         workflow: ADD
         text-detector: "release notes preview comment"
-        edit-mode: append
+        edit-mode: replace
+        comment-author: "github-actions[bot]"
         comment: |
           ---
           ## Breaking changes file `docs/breaking-changes/v${{ steps.release-notes-preview.outputs.new-release-major-version }}.md`
