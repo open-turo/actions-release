@@ -2,7 +2,8 @@ name: GitHub Action Release Notes Preview
 description: |-
   Github action that lints release notes. It generates release notes using semantic-release and posts them as a comment in
   a pull request with the changes that would be included in the next version of the codebase if the pull request is
-  merged. It also will fail if there are breaking changes and no `v<major-version>.md` doc has been created.
+  merged. It also will fail if there are breaking changes and no `v<major-version>.md` doc has been created, or if a
+  breaking changes doc is added without a matching BREAKING CHANGE commit marker.
 inputs:
   checkout-repo:
     required: false
@@ -143,6 +144,61 @@ runs:
         echo "required=${breaking_changes_file_missing}" >> $GITHUB_OUTPUT
         echo "default_content=${breaking_changes_file_default_content}" >> $GITHUB_OUTPUT
         echo "exists=${breaking_changes_file_exists}" >> $GITHUB_OUTPUT
+
+    - name: Check for orphan breaking changes doc
+      id: orphan-breaking-changes-doc
+      if: inputs.enforce-breaking-changes-docs == 'true' && github.event.pull_request.number != ''
+      shell: bash
+      run: |
+        new_bc_docs=$(git diff --name-only --diff-filter=A "origin/${{ github.event.pull_request.base.ref }}...HEAD" -- docs/breaking-changes/)
+        if [ -n "$new_bc_docs" ]; then
+          release_type="${{ steps.release-notes-preview.outputs.new-release-type }}"
+          if [ "$release_type" != "major" ]; then
+            echo "orphan=true" >> $GITHUB_OUTPUT
+            echo "files=$new_bc_docs" >> $GITHUB_OUTPUT
+            echo "::error::Breaking change doc added ($new_bc_docs) but semantic-release does not detect a major version bump (detected: ${release_type:-none})."
+          else
+            echo "orphan=false" >> $GITHUB_OUTPUT
+          fi
+        else
+          echo "orphan=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Comment orphan breaking changes doc
+      uses: open-turo/action-conditional-pr-comment@v1
+      if: steps.orphan-breaking-changes-doc.outputs.orphan == 'true'
+      with:
+        github-token: ${{ inputs.github-token }}
+        workflow: ADD
+        text-detector: "<!-- orphan breaking changes comment -->"
+        edit-mode: replace
+        comment-author: "github-actions[bot]"
+        comment: |
+          ## Error: breaking changes doc without matching commit marker
+
+          A breaking changes documentation file was added:
+          ```
+          ${{ steps.orphan-breaking-changes-doc.outputs.files }}
+          ```
+
+          But none of the commits in this PR will trigger a **major** version bump.
+          semantic-release will produce a minor or patch release, and the doc filename will not match the actual release version.
+
+          **Fix:** add a `BREAKING CHANGE:` footer to the relevant commit message:
+          ```
+          fix: your commit subject
+
+          BREAKING CHANGE: description of what breaks for consumers
+          ```
+
+          ---
+          <!-- orphan breaking changes comment -->
+
+    - name: Fail if orphan breaking changes doc
+      if: steps.orphan-breaking-changes-doc.outputs.orphan == 'true'
+      shell: bash
+      run: |
+        echo "::error::Breaking changes doc was added but no BREAKING CHANGE commit marker found. semantic-release will not produce a major version bump." && exit 1
 
     - name: Comment missing breaking changes doc
       uses: open-turo/action-conditional-pr-comment@v1
