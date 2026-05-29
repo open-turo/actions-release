@@ -172,7 +172,6 @@ runs:
         workflow: ADD
         text-detector: "<!-- orphan breaking changes comment -->"
         edit-mode: replace
-        comment-author: "github-actions[bot]"
         comment: |
           ## Error: breaking changes doc without matching commit marker
 
@@ -193,6 +192,7 @@ runs:
 
           ---
           <!-- orphan breaking changes comment -->
+        comment-author: "github-actions[bot]"
 
     - name: Fail if orphan breaking changes doc
       if: steps.orphan-breaking-changes-doc.outputs.orphan == 'true'
