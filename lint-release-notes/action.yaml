@@ -156,12 +156,10 @@ runs:
             echo "orphan=true" >> $GITHUB_OUTPUT
             echo "files=$new_bc_docs" >> $GITHUB_OUTPUT
             echo "::error::Breaking change doc added ($new_bc_docs) but semantic-release does not detect a major version bump (detected: ${{ steps.release-notes-preview.outputs.new-release-type }})."
-          else
-            echo "orphan=false" >> $GITHUB_OUTPUT
+            exit 0
           fi
-        else
-          echo "orphan=false" >> $GITHUB_OUTPUT
         fi
+        echo "orphan=false" >> $GITHUB_OUTPUT
 
     - name: Comment orphan breaking changes doc
       uses: open-turo/action-conditional-pr-comment@v1
