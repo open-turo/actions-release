@@ -152,11 +152,10 @@ runs:
       run: |
         new_bc_docs=$(git diff --name-only --diff-filter=A "origin/${{ github.event.pull_request.base.ref }}...HEAD" -- docs/breaking-changes/)
         if [ -n "$new_bc_docs" ]; then
-          release_type="${{ steps.release-notes-preview.outputs.new-release-type }}"
-          if [ "$release_type" != "major" ]; then
+          if [ "${{ steps.release-notes-preview.outputs.new-release-type }}" != "major" ]; then
             echo "orphan=true" >> $GITHUB_OUTPUT
             echo "files=$new_bc_docs" >> $GITHUB_OUTPUT
-            echo "::error::Breaking change doc added ($new_bc_docs) but semantic-release does not detect a major version bump (detected: ${release_type:-none})."
+            echo "::error::Breaking change doc added ($new_bc_docs) but semantic-release does not detect a major version bump (detected: ${{ steps.release-notes-preview.outputs.new-release-type }})."
           else
             echo "orphan=false" >> $GITHUB_OUTPUT
           fi
