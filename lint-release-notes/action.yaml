@@ -191,12 +191,6 @@ runs:
           <!-- orphan breaking changes comment -->
         comment-author: "github-actions[bot]"
 
-    - name: Fail if orphan breaking changes doc
-      if: steps.orphan-breaking-changes-doc.outputs.orphan == 'true'
-      shell: bash
-      run: |
-        echo "::error::Breaking changes doc was added but no BREAKING CHANGE commit marker found. semantic-release will not produce a major version bump." && exit 1
-
     - name: Comment missing breaking changes doc
       uses: open-turo/action-conditional-pr-comment@v1
       if: steps.breaking-changes-file.outputs.required == 'true'
@@ -274,6 +268,11 @@ runs:
           ${{ steps.breaking-changes-file-contents.outputs.stdout }}
           ---
 
+    - name: Fail if orphan breaking changes doc
+      if: steps.orphan-breaking-changes-doc.outputs.orphan == 'true'
+      shell: bash
+      run: |
+        echo "::error::Breaking changes doc was added but no BREAKING CHANGE commit marker found. semantic-release will not produce a major version bump." && exit 1
     - name: Fail if we are checking for the breaking changes doc and it is missing
       if: steps.breaking-changes-file.outputs.required == 'true'
       shell: bash
