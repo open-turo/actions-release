@@ -60,7 +60,7 @@ runs:
   using: composite
   steps:
     - name: Setup tools
-      uses: actions/setup-node@v6
+      uses: actions/setup-node@v7
       with:
         node-version: "24.18.0"
     - name: Semantic-release
