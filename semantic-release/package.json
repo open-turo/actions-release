@@ -5,11 +5,11 @@
     "@actions/core": "^3.0.0",
     "@actions/exec": "^3.0.0",
     "@actions/github": "^9.0.0",
-    "@vercel/ncc": "^0.44.0",
+    "@vercel/ncc": "^0.45.0",
     "semver": "^7.7.4"
   },
   "devDependencies": {
-    "@open-turo/eslint-config-typescript": "23.1.14",
+    "@open-turo/eslint-config-typescript": "23.2.1",
     "@vitest/coverage-v8": "4.1.10",
     "@types/node": "25.9.5",
     "eslint": "9.39.5",
