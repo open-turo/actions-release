@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@open-turo/eslint-config-typescript": "23.2.1",
-    "@vitest/coverage-v8": "4.1.10",
+    "@vitest/coverage-v8": "4.1.11",
     "@types/node": "25.9.5",
     "eslint": "9.39.5",
     "prettier": "3.9.6",
@@ -21,7 +21,7 @@
     "tsc-watch": "7.2.1",
     "typescript": "6.0.3",
     "typescript-transform-paths": "4.0.0",
-    "vitest": "4.1.10"
+    "vitest": "4.1.11"
   },
   "engines": {
     "node": ">= 20"
