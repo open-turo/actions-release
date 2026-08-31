@@ -60,7 +60,7 @@ runs:
     # Run semantic-release to generate release notes
     - name: Generate release notes
       id: release-notes-preview
-      uses: open-turo/actions-release/semantic-release@v5
+      uses: open-turo/actions-release/semantic-release@fix/skip-npm-auth-in-release-notes-preview
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
       with:
