@@ -69,6 +69,10 @@ runs:
         extra-plugins: ${{ inputs.extra-plugins }}
         semantic-version: ${{ inputs.semantic-version }}
         override-github-ref-name: ${{ steps.source-vars.outputs.branch }}
+        # This preview never publishes, so skip npm registry authentication (OIDC trusted
+        # publishing is scoped to a single workflow per package and can't cover this one too;
+        # a token would otherwise be required just to satisfy `npm whoami`).
+        npm-publish: false
 
     # Add release notes preview to PR
     - name: Add release notes comment

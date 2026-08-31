@@ -24,6 +24,9 @@ inputs:
   semantic-version:
     required: false
     description: "Specify what version of semantic release to use"
+  npm-publish:
+    required: false
+    description: "Override the `npmPublish` option of @semantic-release/npm. Set to `false` to skip npm registry authentication entirely, e.g. for a dry-run that will never publish. Leave unset to use the value from your semantic-release configuration."
   override-github-ref-name:
     required: false
     description: "Allow for override of github ref-name for running pull and repository dispatch triggered events"
@@ -74,6 +77,7 @@ runs:
         SEMANTIC_ACTION_EXTRA_PLUGINS: ${{ inputs.extra-plugins }}
         SEMANTIC_ACTION_BRANCHES: ${{ inputs.branches }}
         SEMANTIC_ACTION_SEMANTIC_VERSION: ${{ inputs.semantic-version }}
+        SEMANTIC_ACTION_NPM_PUBLISH: ${{ inputs.npm-publish }}
       run: |
         if [[ ! -z "$OVERRIDE_REF_NAME" ]]; then
 

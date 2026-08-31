@@ -49,6 +49,7 @@ interface Inputs {
   ci: boolean;
   dryRun: boolean;
   extraPlugins: string[];
+  npmPublish?: boolean;
   semanticVersion?: string;
 }
 
@@ -79,6 +80,7 @@ export async function main() {
           branches: inputs.branches,
           ci: inputs.ci,
           dryRun: inputs.dryRun,
+          npmPublish: inputs.npmPublish,
         }).filter(([, value]) => value != undefined),
       ),
     );
@@ -144,6 +146,9 @@ function getInputs(): Inputs {
       .trim()
       .split(" ")
       .filter((package_) => package_ !== ""),
+    npmPublish: process.env.SEMANTIC_ACTION_NPM_PUBLISH
+      ? process.env.SEMANTIC_ACTION_NPM_PUBLISH === "true"
+      : undefined,
     semanticVersion: process.env.SEMANTIC_ACTION_SEMANTIC_VERSION || undefined,
   };
 }

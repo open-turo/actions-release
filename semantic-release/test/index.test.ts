@@ -83,6 +83,7 @@ describe("semantic-release", () => {
     delete process.env.SEMANTIC_ACTION_CI;
     delete process.env.SEMANTIC_ACTION_DRY_RUN;
     delete process.env.SEMANTIC_ACTION_EXTRA_PLUGINS;
+    delete process.env.SEMANTIC_ACTION_NPM_PUBLISH;
     delete process.env.SEMANTIC_ACTION_SEMANTIC_VERSION;
   });
 
@@ -229,6 +230,46 @@ describe("semantic-release", () => {
         ],
         "ci": true,
         "dryRun": true,
+      }
+    `);
+  });
+
+  test("omits npmPublish when not set", async () => {
+    mockNpmInstall();
+    mockRelease({ nextRelease: undefined });
+    await main();
+    expect(semanticReleaseMock).toHaveBeenCalledTimes(1);
+    expect(semanticReleaseMock.mock.calls.at(0)?.[0]).not.toHaveProperty(
+      "npmPublish",
+    );
+  });
+
+  test("passes npmPublish false to skip npm registry auth", async () => {
+    process.env.SEMANTIC_ACTION_NPM_PUBLISH = "false";
+    mockNpmInstall();
+    mockRelease({ nextRelease: undefined });
+    await main();
+    expect(semanticReleaseMock).toHaveBeenCalledTimes(1);
+    expect(semanticReleaseMock.mock.calls.at(0)?.[0]).toMatchInlineSnapshot(`
+      {
+        "ci": false,
+        "dryRun": false,
+        "npmPublish": false,
+      }
+    `);
+  });
+
+  test("passes npmPublish true", async () => {
+    process.env.SEMANTIC_ACTION_NPM_PUBLISH = "true";
+    mockNpmInstall();
+    mockRelease({ nextRelease: undefined });
+    await main();
+    expect(semanticReleaseMock).toHaveBeenCalledTimes(1);
+    expect(semanticReleaseMock.mock.calls.at(0)?.[0]).toMatchInlineSnapshot(`
+      {
+        "ci": false,
+        "dryRun": false,
+        "npmPublish": true,
       }
     `);
   });

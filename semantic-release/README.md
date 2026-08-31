@@ -48,6 +48,7 @@ jobs:
 | dry-run | Whether to run semantic release in `dry-run` mode. It will override the dryRun attribute in your configuration file | `false` |  |
 | extra-plugins | Extra plugins for pre-install. You can also specify specifying version range for the extra plugins if you prefer. | `false` |  |
 | semantic-version | Specify what version of semantic release to use | `false` |  |
+| npm-publish | Override the `npmPublish` option of @semantic-release/npm. Set to `false` to skip npm registry authentication entirely, e.g. for a dry-run that will never publish. Leave unset to use the value from your semantic-release configuration. | `false` |  |
 | override-github-ref-name | Allow for override of github ref-name for running pull and repository dispatch triggered events | `false` |  |
 <!-- action-docs-inputs -->
 
