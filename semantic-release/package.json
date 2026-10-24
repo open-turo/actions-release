@@ -9,7 +9,7 @@
     "semver": "^7.7.4"
   },
   "devDependencies": {
-    "@open-turo/eslint-config-typescript": "23.2.6",
+    "@open-turo/eslint-config-typescript": "23.2.7",
     "@vitest/coverage-v8": "5.0.5",
     "@types/node": "25.9.9",
     "eslint": "9.39.5",
